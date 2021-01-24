@@ -1,13 +1,13 @@
-title:              Junha's space
-email:              junha4304@gmail.com
-description:        Welcome to junha's workspace!
-author:             junha
-baseurl:            " "
-url:                "https://junha-lee.github.io"
+title:              Clean Blog
+email:              your-email@example.com
+description:        A Blog Theme by Start Bootstrap
+author:             Start Bootstrap
+baseurl:            "/startbootstrap-clean-blog-jekyll"
+url:                "https://startbootstrap.github.io"
 
 # Social Profiles
 twitter_username:   SBootstrap
-github_username:    "https://github.com/junha-lee"
+github_username:    StartBootstrap
 facebook_username:  StartBootstrap
 instagram_username:  
 linkedin_username:
@@ -19,7 +19,6 @@ google_analytics:   UA-XXXXXXXXX-X # out your google-analytics code
 markdown:           kramdown
 paginate:           5
 paginate_path:      "/posts/page:num/"
-theme: jekyll-theme-clean-blog
 plugins:
   - jekyll-feed
   - jekyll-paginate
