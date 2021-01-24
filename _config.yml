@@ -107,15 +107,15 @@ analytics:
 
 # Site Author
 author:
-  name             : "Ohjinjin"
+  name             : "JUNHA"
   avatar           : "/assets/images/ohjinjin.JPG"
   bio              : "I am an **amazing** person."
   location         : "SoonCheonHyang Univ."
-  email            : "ohjinjin0408@naver.com"
+  email            : "junha4304@gmail.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: mailto:ohjinjin0408@naver.com
+      url: mailto:junha4304@gmail.com
     - label: "Website"
       icon: "fas fa-fw fa-link"
       url: "github.io.ohjinjin"
@@ -124,10 +124,10 @@ author:
       # url: "https://twitter.com/"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
-      url: "https://facebook.com/profile.php?id=100005514605569"
+      url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      url: "https://github.com/ohjinjin"
+      url: "https://github.com/junha-lee"
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       # url: "https://instagram.com/"
