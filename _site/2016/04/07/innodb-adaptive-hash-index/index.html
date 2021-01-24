@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+
+
+<title>MySQL InnoDB의 Adaptive Hash Index 활용</title>
+<meta name="title" content="MySQL InnoDB의 Adaptive Hash Index 활용" />
+<meta name="author" content="ian.lee"/>
+<meta name="description" content="개요 MySQL의 InnoDB에는 Adaptive Hash Index 기능이 있는데, 어떤 상황에서 효과가 있고 사용 시 반드시 주의를 해야할 점에 대해서 정리하도록 하겠습니다. InnoDB B-Tree 인덱스 MySQL의 InnoDB의 대표적인 인덱스는 B-Tree입니다. 데이터는 Primary Key 순으로 정렬되어 관리되고, Secondrary Key는 인덱스키+PK를 조합으로 정렬이 되어 있습니다. 즉, 특정 데이터를 찾기 위해서는 Secondrary Key에서 PK를 찾고, 그 PK를 통해 다시 원하는 데이터로 찾아가는 형태로 데이터가 처리 됩니다. 트리의 가장 큰 강점은 데이터 접근 퍼포먼스가 데이터 증가량에 따라서도 결코 선형적으로 증가하지..."/>
+
+<meta property="fb:app_id" content="1204347326263800"/>
+
+<meta property="og:site_name" content="kakao 기술 블로그"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="MySQL InnoDB의 Adaptive Hash Index 활용"/>
+<meta property="og:description" content="개요 MySQL의 InnoDB에는 Adaptive Hash Index 기능이 있는데, 어떤 상황에서 효과가 있고 사용 시 반드시 주의를 해야할 점에 대해서 정리하도록 하겠습니다. InnoDB B-Tree 인덱스 MySQL의 InnoDB의 대표적인 인덱스는 B-Tree입니다. 데이터는 Primary Key 순으로 정렬되어 관리되고, Secondrary Key는 인덱스키+PK를 조합으로 정렬이 되어 있습니다. 즉, 특정 데이터를 찾기 위해서는 Secondrary Key에서 PK를 찾고, 그 PK를 통해 다시 원하는 데이터로 찾아가는 형태로 데이터가 처리 됩니다. 트리의 가장 큰 강점은 데이터 접근 퍼포먼스가 데이터 증가량에 따라서도 결코 선형적으로 증가하지..."/>
+<meta property="og:url" content="http://localhost:4000/2016/04/07/innodb-adaptive-hash-index/"/>
+<meta property="og:image" content="http://localhost:4000/files/covers/index.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="MySQL InnoDB의 Adaptive Hash Index 활용"/>
+<meta name="twitter:description" content="개요 MySQL의 InnoDB에는 Adaptive Hash Index 기능이 있는데, 어떤 상황에서 효과가 있고 사용 시 반드시 주의를 해야할 점에 대해서 정리하도록 하겠습니다. InnoDB B-Tree 인덱스 MySQL의 InnoDB의 대표적인 인덱스는 B-Tree입니다. 데이터는 Primary Key 순으로 정렬되어 관리되고, Secondrary Key는 인덱스키+PK를 조합으로 정렬이 되어 있습니다. 즉, 특정 데이터를 찾기 위해서는 Secondrary Key에서 PK를 찾고, 그 PK를 통해 다시 원하는 데이터로 찾아가는 형태로 데이터가 처리 됩니다. 트리의 가장 큰 강점은 데이터 접근 퍼포먼스가 데이터 증가량에 따라서도 결코 선형적으로 증가하지..."/>
+<meta name="twitter:label1" content="Written by"/>
+<meta name="twitter:data1" content="ian.lee"/>
+<meta name="twitter:image:src" content="http://localhost:4000/files/covers/index.jpg"/>
+
+<meta name="twitter:label2" content="Filed under"/>
+<meta name="twitter:data2" content="devops,mysql,innodb,adaptive-hash-index"/>
+
+<meta property="article:tag" content="devops"/>
+
+<meta property="article:tag" content="mysql"/>
+
+<meta property="article:tag" content="innodb"/>
+
+<meta property="article:tag" content="adaptive-hash-index"/>
+
+
+
+<meta property="article:published_time" content="2016-04-07T16:52:00+09:00"/>
+
+
+<meta property="article:author" content="http://localhost:4000/authors/ian.lee"/>
+
+<link href="http://localhost:4000/rss/" rel="alternate" type="application/rss+xml" title="RSS"/>
+<link href="/assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" type="image/png"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon-precomposed" type="image/png"/>
+<link href="/assets/lib/normalize.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/css/monokai.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/lib/magnific-popup.min.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/fonts/Kakao.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/css/screen.css" rel="stylesheet" type="text/css"/>
+<script>
+    if (window.location.host.indexOf('tech.kakao.com') > -1 && window.location.protocol == "https:"){
+        window.location = window.location.toString().replace(/^https:/, "http:");
+    }
+</script>
+
+</head>
+<body class="post-template">
+
+<div id="header">
+    <button id="menu-toggle" type="button">
+        <span class="sr-only">Toggle Navigation Menu</span>
+    </button>
+    <button id="search-toggle" type="button">
+        <span class="sr-only">Toggle Search Form</span>
+    </button>
+    <a id="logo" href="/">
+        <span class="sr-only">KakaoTech</span>
+    </a>
+    <div id="search">
+        <input id="search-input" type="search" placeholder="Search..." value="" />
+    </div>
+    <ul class="search__results" id="results-container"></ul>
+
+    <ul id="menu" class="nav">
+        <li class=" active "><a href="/">블로그</a></li>
+        <li class=""><a href="/opensource/">오픈소스</a></li>
+        <li class=""><a href="/openapi/">오픈API</a></li>
+        <li class=""><a href="/events/">기술행사</a></li>
+    </ul>
+</div>
+<!-- Script pointing to jekyll-search.js -->
+<script src="/dest/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '/search2.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: '<li>No results found</li>',
+        limit: 15,
+        fuzzy: false,
+        exclude: ['Welcome']
+    })
+</script><!-- #header -->
+
+
+
+<div id="wrapper">
+    <div id="navbar" class="container">
+  <h5><a id="link-back" href="/">Back to Posts</a></h5>
+  
+<ul id="shares">
+    <li class="stalk" style="display:none">
+        <a id="kakao-link-btn" href="javascript:;"></a>
+    </li>
+    <li>
+        <a id="share-kakaostory" href="javascript:shareStory('http://localhost:4000/2016/04/07/innodb-adaptive-hash-index/');"></a>
+    </li>
+
+    
+    <li>
+        <a id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/2016/04/07/innodb-adaptive-hash-index/"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="sr-only">Share to Facebook</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-twitter"
+           href="https://twitter.com/intent/tweet?text=MySQL%20InnoDB%EC%9D%98%20Adaptive%20Hash%20Index%20%ED%99%9C%EC%9A%A9&url=http://localhost:4000/2016/04/07/innodb-adaptive-hash-index/">
+            <span class="sr-only">Share to Twitter</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-google" href="https://plus.google.com/share?url=http://localhost:4000/2016/04/07/innodb-adaptive-hash-index/"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+            <span class="sr-only">Share to Google+</span>
+        </a>
+    </li>
+    
+</ul>
+
+</div>
+
+<div id="cover" class="container" style="background-image: url(/files/covers/index.jpg);" >
+  <div>
+    <h1>MySQL InnoDB의 Adaptive Hash Index 활용</h1>
+    <p>
+      
+      <a href="/tags/devops">devops</a>
+      ,
+      
+      <a href="/tags/mysql">mysql</a>
+      ,
+      
+      <a href="/tags/innodb">innodb</a>
+      ,
+      
+      <a href="/tags/adaptive-hash-index">adaptive-hash-index</a>
+      
+      
+    </p>
+    
+
+
+  </div>
+</div>
+
+<div id="content" class="container post" role="main">
+  <div id="post-content"><h2 id="개요">개요</h2>
+
+<p><a href="http://www.mysql.com">MySQL</a>의 <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-introduction.html">InnoDB</a>에는 <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-adaptive-hash.html">Adaptive Hash Index</a> 기능이 있는데, 어떤 상황에서 효과가 있고 사용 시 반드시 주의를 해야할 점에 대해서 정리하도록 하겠습니다.</p>
+
+<h2 id="innodb-b-tree-인덱스">InnoDB B-Tree 인덱스</h2>
+
+<p>MySQL의 InnoDB의 대표적인 인덱스는 <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a>입니다.  데이터는 Primary Key 순으로 정렬되어 관리되고, Secondrary Key는 <code class="highlighter-rouge">인덱스키+PK</code>를 조합으로 정렬이 되어 있습니다.</p>
+
+<p>즉, 특정 데이터를 찾기 위해서는 Secondrary Key에서 PK를 찾고, 그 PK를 통해 다시 원하는 데이터로 찾아가는 형태로 데이터가 처리 됩니다.
+트리의 가장 큰 강점은 데이터 접근 퍼포먼스가 데이터 증가량에 따라서도 결코 선형적으로 증가하지 않다는 점에 있습니다.</p>
+
+<p>참고로, PK 접근 시 데이터 접근에 소요되는 비용은 <code class="highlighter-rouge">O(logN)</code>이고,두번 트리에 접근하는 Secondrary Key에 소요되는 비용은 <code class="highlighter-rouge">2 * O(logN)</code>입니다.</p>
+
+<p><img src="/files/mysql-btree-index.png" alt="B-Tree 인덱스: Primary Key vs Secondary Key" /></p>
+
+<p>데이터가 아무리 많아져도, 데이터 접근에 소요되는 비용이 크게 증가되지 않음에도, 상황에 따라 효율이 좋지 않습니다. 자주 사용되는 데이터 탐색에도 매번 트리의 경로를 쫓아가야 한다는 것이죠. 게다가 Mutex Lock이 과도하게 잡히게 되면, 적은 데이터 셋에도 불구하고 DB 자원 사용 효율이 떨어지게 됩니다.</p>
+
+<h2 id="innodb-adaptive-hash-index">InnoDB Adaptive Hash Index</h2>
+
+<p>InnoDB에서는 앞서 언급한 상황을 해결하기 위해, InnoDB Adative Hash Index 기능이 있습니다. 자주 사용되는 칼럼을 해시로 정의하여, B-Tree 를 타지 않고 바로 데이터에 접근할 수 있는 기능이죠. “Adaptive”라는 단어에서 예상할 수 있겠지만, 모든 값들이 해시로 생성이 되는 것이 아니라, <strong>자주</strong> 사용되는 데이터 값만 내부적으로 판단하여 상황에 맞게 해시 값을 생성합니다.</p>
+
+<p><img src="/files/mysql-adaptive-hash-index.png" alt="Adative Hash Index" /></p>
+
+<p>즉, 전체 데이터를 대상으로 해시값을 생성하지는 않는다는 말인데요,
+Adative Hash Index에 할당되는 메모리는 전체 <code class="highlighter-rouge">Innodb_Buffer_Pool_Size</code>의 <code class="highlighter-rouge">1/64</code>만큼으로 초기화됩니다.</p>
+
+<p>최소 메모리 할당은 저렇게 할당되나, 최대 사용되는 메모리 양은 알 수는 없습니다. 서버의 특성마다 다르겠지만, Apdaptive Hash Index를 활성화한 경우 반드시 현재 사용하고 있는 관련 메모리를 모니터링을 해야합니다. (서버마다 사용량이 다를 수 있습니다.)</p>
+
+<p>이 기능은 <code class="highlighter-rouge">innodb_adaptive_hash_index</code>라는 파라메터로 기능을 켜고 끌 수 있는데, MySQL 5.5 버전(엄밀하게 말하면 InnoDB Plugin 1.0.3 버전)부터는 동적으로 Global 변수를 변경할 수 있습니다.</p>
+
+<ul>
+  <li>켜고</li>
+</ul>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">mariadb&gt;</span> <span class="nb">set </span>global innodb_adaptive_hash_index <span class="o">=</span> 1<span class="p">;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>끄고
+    <div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">mariadb&gt;</span> <span class="nb">set </span>global innodb_adaptive_hash_index <span class="o">=</span> 0<span class="p">;</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>관련 통계 정보는 아래와 같이 확인하면 됩니다.</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">mariadb&gt;</span> show global status like <span class="s1">'Innodb_adaptive_hash%'</span><span class="p">;</span>
+<span class="go">+----------------------------------------+------------+
+| Variable_name                          | Value      |
++----------------------------------------+------------+
+| Innodb_adaptive_hash_cells             | 42499631   |
+| Innodb_adaptive_hash_heap_buffers      | 0          |
+| Innodb_adaptive_hash_hash_searches     | 21583      |
+| Innodb_adaptive_hash_non_hash_searches | 3768761684 |
++----------------------------------------+------------+
+</span></code></pre></div></div>
+
+<p><a href="https://mariadb.com">MariaDB</a>에서는 Global Status에서 현황을 파악해볼 수 있지만, Oracle MySQL에서는 관련 통계정보를 status로 관리하지 않습니다. 대신, 다음과 같이 엔진 상태 정보에서 관련 정보를 추출할 수 있습니다.</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">mysql&gt;</span> SHOW ENGINE INNODB STATUS
+<span class="go">.. 중략 ..
+-------------------------------------
+INSERT BUFFER AND ADAPTIVE HASH INDEX
+-------------------------------------
+Ibuf: size 1, free list len 365, seg size 367, 5414843 merges
+merged operations:
+ insert 4902179, delete mark 1620426, delete 70789
+discarded operations:
+ insert 0, delete mark 0, delete 0
+Hash table size 17700827, node heap has 41801 buffer(s)
+8217.61 hash searches/s, 957.12 non-hash searches/s
+.. 중략 ..
+</span></code></pre></div></div>
+
+<p>자주 사용되는 자원을 해시를 통해서 직접 접근하기 때문에, 내부적인 락(이를테면 Mutex)으로 인한 지연이 줄어듭니다. 게다가 B-Tree의 데이터 접근 비용(<code class="highlighter-rouge">O(LogN)</code>)에 비해, 해시 데이터 접근 비용인 <code class="highlighter-rouge">O(1)</code>으로 굉장히 빠른 속도로 데이터 처리가 가능한 것이죠. 단 <strong>자주</strong> 사용되는 자원 만을 해시로 생성하기 때문에, 단 건 SELECT로 인하여 반드시 해당 자원을 향한 직접적인 해시 값이 만들어지지 않습니다.</p>
+
+<h2 id="adaptive-hash-index의-효과">Adaptive Hash Index의 효과</h2>
+
+<p>아래와 같이 테스트 테이블을 생성 후 1300만 건 데이터를 만들고, PK로 접근하는 <code class="highlighter-rouge">IN</code> 쿼리를 발생시켜 효과를 확인해봅니다.</p>
+
+<p><code class="highlighter-rouge">IN</code> 절에는 약 30개 정도의 파라메터를 넣고, 300개의 쓰레드에서 5ms 슬립을 줘가며 트래픽을 줍니다.</p>
+
+<ul>
+  <li>테이블 스키마</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">create</span> <span class="k">table</span> <span class="n">ahi_test</span><span class="p">(</span>
+  <span class="n">i</span> <span class="n">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span> <span class="k">primary</span> <span class="k">key</span> <span class="n">auto_increment</span><span class="p">,</span>
+  <span class="n">j</span> <span class="n">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+  <span class="n">v</span> <span class="n">text</span><span class="p">,</span>
+  <span class="k">key</span> <span class="n">ix_j</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<ul>
+  <li>SELECT 쿼리</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="k">left</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">from</span> <span class="n">ahi_test</span>
+<span class="k">where</span> <span class="n">i</span> <span class="k">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,...</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,,);</span>
+</code></pre></div></div>
+
+<p>하단 결과에서 Adaptive Hash Index를 사용하지 않는 경우 CPU가 100% 였으나, Adaptive Hash Index를 사용한 이후에는 60% 정도로 사용률이 내려갔습니다.</p>
+
+<p><img src="http://2.bp.blogspot.com/-pQWXX9ilUS0/VLji-O6eVxI/AAAAAAAAAN8/xAcXUPZX8sY/s1600/image2014-12-22%2B14-20-47.png" alt="CPU Utilization" /></p>
+
+<p>CPU는 줄었으나, 쿼리 응답 시간이 줄었기에 처리량 또한 20,000에서 37,000으로 늘어났습니다.</p>
+
+<p><img src="/files/mysql-database-activity.png" alt="Database Activity" /></p>
+
+<p>모든 데이터를 해시로 만들지 않기에, 해시가 켜진 상태에서도 여전히 B-Tree를 통해서 데이터 접근을 합니다. 이 수치는 장기간 테스트 쿼리를 날려보아도 변함이 없습니다.</p>
+
+<p><img src="/files/mysql-adaptive-hash-search.png" alt="Adaptive Hash Search" /></p>
+
+<p>Semaphore도 크게 줄어들었습니다.</p>
+
+<p><img src="/files/mysql-semaphores.png" alt="Semaphores" /></p>
+
+<h2 id="주의사항">주의사항</h2>
+
+<p>빈번한 데이터 접근이 많은 환경에서는 대단히 효율이 좋은 결과를 나타내었으며, 실제 MySQL을 활용하여 앞선 테스트 환경과 비슷한 서비스에서 효율적으로 잘 활용하고 있습니다. 그러나, 주의를 해야할 점은 오래된 테이블인 경우에도 해시가 여전히 메모리에 남아있을 수 있으며, 이에 대한 제어는 불가합니다.</p>
+
+<p><img src="/files/mysql-hash-node-size.png" alt="Hash Node Size" /></p>
+
+<p>얼마전, 수개월 전 <code class="highlighter-rouge">pt-online-schema-change</code> 유틸리티를 사용을 하여 스키마를 변경한 이후, 오래된 테이블을 정리하다가 대형 장애가 발생하였습니다.</p>
+
+<p>데이터 사이즈는 크지 않은 상태(1~2G)였으며, 파일시스템 또한 xfs였던 지라 디스크 I/O적인 이슈 없이 쉽게 테이블 정리가 가능할 것으로 판단하였으나, 해시 메모리 정리하는 과정에서 쿼리 응답 속도가 떨어지게 되어서 결과적으로 장애가 발생하게 되었습니다.</p>
+
+<p>하단은 해시 인덱스를 사용하던 환경에서 오래된 테이블을 정리하는 시점의 쿼리 처리량에 대한 결과입니다.</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">| Com_select | 39041 |
+| Com_select | 39189 |
+| Com_select | 38774 |
+| Com_select | 38953 |
+| Com_select | 39527 |
+| Com_select | 37906 |
+| Com_select | 39316 |
+| Com_select | 37541 |
+| Com_select | 37972 |
+| Com_select | 32484 | &lt;=== DROP OLD TABLE START
+| Com_select | 27514 |
+| Com_select | 27602 |
+| Com_select | 27692 |
+| Com_select | 27918 |
+| Com_select | 27818 |
+| Com_select | 28266 |
+| Com_select | 28383 |
+| Com_select | 28350 |
+| Com_select | 37047 | &lt;=== DROP OLD TABLE END
+| Com_select | 39572 |
+| Com_select | 38868 |
+| Com_select | 39315 |
+| Com_select | 38738 |
+| Com_select | 39548 |
+| Com_select | 39413 |
+| Com_select | 38978 |
+</span></code></pre></div></div>
+
+<p>수 개월동안 사용되지 않은 테이블일지라도, Adaptive Hash Index를 사용하고 있다면 테이블 정리 시 최대한 트래픽이 없는 시점에 진행을 해야 합니다.</p>
+
+<h2 id="결론">결론</h2>
+
+<p>InnoDB Adaptive Hash Index는 B-Tree의 한계를 보완할 수 있는 좋은 기능입니다.</p>
+
+<p>특히 단일 랜덤 키 접근이 빈도있게 발생하는 경우라면, B-Tree 를 통하지 않고 데이터에 접근/처리가 가능하기에 좋은 퍼포먼스를 보입니다.</p>
+
+<p>그러나, <strong>자주</strong> 사용되는 데이터를 옵티마이저가 판단하여 해시 키로 만들기 때문에 제어가 어려우며, 수 개월 동안 사용되지 않던 테이블일지라도 기존 해시 자료 구조에 데이터가 남아 있게 되면, 테이블 Drop 시 영향을 줄 수 있습니다. 해시 인덱스에 의존하여 트래픽이 주로 처리되는 서비스인 경우 이런 점을 염두해 두고 사용을 해야겠습니다.</p>
+
+<blockquote>
+  <p>이 글은 카카오의 데이터베이스팀에서 운영하는 기술 블로그 <a href="http://small-dbtalk.blogspot.kr">small-dbtalk</a>의 글 <a href="http://small-dbtalk.blogspot.kr/2015/01/innodb-adaptive-hash-index_19.html">InnoDB Adaptive Hash Index</a>을 옮긴 것입니다.</p>
+
+  <p>데이터베이스에 관심이 있으신 분들이라면 <a href="http://small-dbtalk.blogspot.kr">small-dbtalk</a>에서 카카오의 데이터베이스팀이 공유하는 다양한 사례들과 기술들을 만나보세요. 절대 후회하지 않으실 거예요~~ ;)</p>
+</blockquote>
+
+<ul>
+  <li>커버 이미지 출처: <a href="https://flic.kr/p/ir8u49">Index</a> © <a href="https://www.flickr.com/photos/lendingmemo/">Simon Cunningham</a></li>
+</ul>
+</div>
+  <div id="post-footer">
+    
+    <a id="post-author" href="/authors/ian.lee/">
+      <div id="author-image" style="background-image:url(/files/authors/ian.lee.jpg);">
+        <span class="sr-only">ian.lee's profile image</span>
+      </div>
+      <p id="author-name">ian.lee</p>
+    </a>
+    <p id="post-date">2016-04-07 16:52</p>
+    <a id="post-more" href="/authors/ian.lee/">
+      <span>Read more posts by this author</span>
+    </a>
+  </div>
+</div>
+
+<div class="container" style="margin-top:25px; padding:0px">
+  <a href="https://www.welcomekakao.com" target="_blank"><img src="/files/career2020.jpg" style="width:100%;"></a>
+</div>
+
+<div id="post-links" class="container">
+  
+  
+  <div id="post-prev" style="background-image: url(/files/covers/links.jpg);" >
+    <div>
+      <h3><a href="/2016/04/07/weekly-links-1/">Weekly Links #1 - 2016년 4월 첫째주</a></h3>
+      <p>YOU MIGHT ENJOY</p>
+    </div>
+  </div>
+  
+  
+  
+  <div id="post-next" style="background-image: url(/files/mobil-cover.jpg);" >
+    <div>
+      <h3><a href="/2016/04/21/mobil/">모빌(MoBiL) - kakao의 모바일앱 CI/CD 플랫폼</a></h3>
+      <p>NEXT POST</p>
+    </div>
+  </div>
+  
+</div>
+
+<div id="lightbox">
+  <div id="lightbox-image"></div>
+</div>
+
+    <div class="clearfix"></div>
+
+    <a href="#" id="back-to-top"></a>
+</div>
+
+<div id="footer" class="container-fluid">
+    <ul id="links">
+        
+        <li>
+            <a id="link-github" href="http://github.com/kakao" target="_blank">
+                <span class="sr-only">github</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-facebook" href="http://facebook.com/nkakao" target="_blank">
+                <span class="sr-only">facebook</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-twitter" href="http://twitter.com/kakaodev" target="_blank">
+                <span class="sr-only">twitter</span>
+            </a>
+        </li>
+        
+        <li>
+            <a id="link-rss" href="/rss" target="_blank">
+                <span class="sr-only">rss</span>
+            </a>
+        </li>
+    </ul>
+    <ul id="footer-menu">
+        <li><a href="//www.kakaocorp.com">Kakao</a></li>
+        <li><a href="//careers.kakao.com/jobs">Jobs</a></li>
+        <li><a href="//privacy.kakaocorp.com">Privacy</a></li>
+    </ul>
+    <p id="copyright">
+        <a href="//www.kakaocorp.com">Copyright &copy; Kakao Corp.</a>
+        All rights reserved.
+    </p>
+</div><!--#footer-->
+
+
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-72007721-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+
+    <script type='text/javascript'>
+   //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    //Kakao.init('65d48e116d8b9409e08960c4800c3017');
+    function shareStory(abs_page_url) {
+        Kakao.Story.share({
+            url: abs_page_url,
+            text: '카카오 기술블로그 #개발자 #카카오'
+        });
+    }
+    //]]>
+</script>
+
+    
+    <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1204347326263800',
+    xfbml      : true,
+    version    : 'v2.7'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+    
+
+    
+    <script>!function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    }(document, 'script', 'twitter-wjs');
+</script>
+
+    
+
+    
+    <script src="https://apis.google.com/js/platform.js" async defer>
+    {
+        lang: 'ko'
+    }
+</script>
+
+    
+
+</body>
+</html>

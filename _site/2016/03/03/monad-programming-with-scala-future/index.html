@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+
+
+<title>Monad Programming with Scala Future</title>
+<meta name="title" content="Monad Programming with Scala Future" />
+<meta name="author" content="liam.m"/>
+<meta name="description" content="함수형 언어에 대해서 공부를 하다보면 언제나 Monad라는 녀석을 마주치게 됩니다. [Category Theory][1]의 수학적인 개념이 바탕이 되어 있는 Monad를 접하면 어렵고 난해해서, 많은 사람들이 Monad를 학습하는 과정에서 함수형 언어를 포기합니다. 하지만 Monad라는 장벽을 넘어서고 나면, 아니 조금만 이해하고 나면 함수형 언어를 개발하는데 있어서의 이해도와 생산성이 급속도로 높아지게 됩니다. Learning Curves (for different programming languages)라는 글에 보면 여러 언어의 학습과정에서 나타다는 다양한 특징을 그래프로 보여줍니다. 그 중에 Haskell의 경우 Monad의 대한 이해 과정을 거치기 전과 후가 확연하게..."/>
+
+<meta property="fb:app_id" content="1204347326263800"/>
+
+<meta property="og:site_name" content="kakao 기술 블로그"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="Monad Programming with Scala Future"/>
+<meta property="og:description" content="함수형 언어에 대해서 공부를 하다보면 언제나 Monad라는 녀석을 마주치게 됩니다. [Category Theory][1]의 수학적인 개념이 바탕이 되어 있는 Monad를 접하면 어렵고 난해해서, 많은 사람들이 Monad를 학습하는 과정에서 함수형 언어를 포기합니다. 하지만 Monad라는 장벽을 넘어서고 나면, 아니 조금만 이해하고 나면 함수형 언어를 개발하는데 있어서의 이해도와 생산성이 급속도로 높아지게 됩니다. Learning Curves (for different programming languages)라는 글에 보면 여러 언어의 학습과정에서 나타다는 다양한 특징을 그래프로 보여줍니다. 그 중에 Haskell의 경우 Monad의 대한 이해 과정을 거치기 전과 후가 확연하게..."/>
+<meta property="og:url" content="http://localhost:4000/2016/03/03/monad-programming-with-scala-future/"/>
+<meta property="og:image" content="http://localhost:4000/files/covers/monad.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Monad Programming with Scala Future"/>
+<meta name="twitter:description" content="함수형 언어에 대해서 공부를 하다보면 언제나 Monad라는 녀석을 마주치게 됩니다. [Category Theory][1]의 수학적인 개념이 바탕이 되어 있는 Monad를 접하면 어렵고 난해해서, 많은 사람들이 Monad를 학습하는 과정에서 함수형 언어를 포기합니다. 하지만 Monad라는 장벽을 넘어서고 나면, 아니 조금만 이해하고 나면 함수형 언어를 개발하는데 있어서의 이해도와 생산성이 급속도로 높아지게 됩니다. Learning Curves (for different programming languages)라는 글에 보면 여러 언어의 학습과정에서 나타다는 다양한 특징을 그래프로 보여줍니다. 그 중에 Haskell의 경우 Monad의 대한 이해 과정을 거치기 전과 후가 확연하게..."/>
+<meta name="twitter:label1" content="Written by"/>
+<meta name="twitter:data1" content="liam.m"/>
+<meta name="twitter:image:src" content="http://localhost:4000/files/covers/monad.jpg"/>
+
+<meta name="twitter:label2" content="Filed under"/>
+<meta name="twitter:data2" content="monad,scala,scalaz,functional-programming"/>
+
+<meta property="article:tag" content="monad"/>
+
+<meta property="article:tag" content="scala"/>
+
+<meta property="article:tag" content="scalaz"/>
+
+<meta property="article:tag" content="functional-programming"/>
+
+
+
+<meta property="article:published_time" content="2016-03-03T10:49:00+09:00"/>
+
+
+<meta property="article:author" content="http://localhost:4000/authors/liam.m"/>
+
+<link href="http://localhost:4000/rss/" rel="alternate" type="application/rss+xml" title="RSS"/>
+<link href="/assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" type="image/png"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon-precomposed" type="image/png"/>
+<link href="/assets/lib/normalize.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/css/monokai.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/lib/magnific-popup.min.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/fonts/Kakao.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/css/screen.css" rel="stylesheet" type="text/css"/>
+<script>
+    if (window.location.host.indexOf('tech.kakao.com') > -1 && window.location.protocol == "https:"){
+        window.location = window.location.toString().replace(/^https:/, "http:");
+    }
+</script>
+
+</head>
+<body class="post-template">
+
+<div id="header">
+    <button id="menu-toggle" type="button">
+        <span class="sr-only">Toggle Navigation Menu</span>
+    </button>
+    <button id="search-toggle" type="button">
+        <span class="sr-only">Toggle Search Form</span>
+    </button>
+    <a id="logo" href="/">
+        <span class="sr-only">KakaoTech</span>
+    </a>
+    <div id="search">
+        <input id="search-input" type="search" placeholder="Search..." value="" />
+    </div>
+    <ul class="search__results" id="results-container"></ul>
+
+    <ul id="menu" class="nav">
+        <li class=" active "><a href="/">블로그</a></li>
+        <li class=""><a href="/opensource/">오픈소스</a></li>
+        <li class=""><a href="/openapi/">오픈API</a></li>
+        <li class=""><a href="/events/">기술행사</a></li>
+    </ul>
+</div>
+<!-- Script pointing to jekyll-search.js -->
+<script src="/dest/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '/search2.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: '<li>No results found</li>',
+        limit: 15,
+        fuzzy: false,
+        exclude: ['Welcome']
+    })
+</script><!-- #header -->
+
+
+
+<div id="wrapper">
+    <div id="navbar" class="container">
+  <h5><a id="link-back" href="/">Back to Posts</a></h5>
+  
+<ul id="shares">
+    <li class="stalk" style="display:none">
+        <a id="kakao-link-btn" href="javascript:;"></a>
+    </li>
+    <li>
+        <a id="share-kakaostory" href="javascript:shareStory('http://localhost:4000/2016/03/03/monad-programming-with-scala-future/');"></a>
+    </li>
+
+    
+    <li>
+        <a id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/2016/03/03/monad-programming-with-scala-future/"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="sr-only">Share to Facebook</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-twitter"
+           href="https://twitter.com/intent/tweet?text=Monad%20Programming%20with%20Scala%20Future&url=http://localhost:4000/2016/03/03/monad-programming-with-scala-future/">
+            <span class="sr-only">Share to Twitter</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-google" href="https://plus.google.com/share?url=http://localhost:4000/2016/03/03/monad-programming-with-scala-future/"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+            <span class="sr-only">Share to Google+</span>
+        </a>
+    </li>
+    
+</ul>
+
+</div>
+
+<div id="cover" class="container" style="background-image: url(/files/covers/monad.jpg);" >
+  <div>
+    <h1>Monad Programming with Scala Future</h1>
+    <p>
+      
+      <a href="/tags/monad">monad</a>
+      ,
+      
+      <a href="/tags/scala">scala</a>
+      ,
+      
+      <a href="/tags/scalaz">scalaz</a>
+      ,
+      
+      <a href="/tags/functional-programming">functional-programming</a>
+      
+      
+    </p>
+    
+
+
+  </div>
+</div>
+
+<div id="content" class="container post" role="main">
+  <div id="post-content"><p>함수형 언어에 대해서 공부를 하다보면 언제나 <strong>Monad</strong>라는 녀석을 마주치게 됩니다. [Category Theory][1]의 수학적인 개념이 바탕이 되어 있는 Monad를 접하면 어렵고 난해해서, 많은 사람들이 Monad를 학습하는 과정에서 함수형 언어를 포기합니다. 하지만 Monad라는 장벽을 넘어서고 나면, 아니 조금만 이해하고 나면 함수형 언어를 개발하는데 있어서의 이해도와 생산성이 급속도로 높아지게 됩니다. <a href="https://github.com/Dobiasd/articles/blob/master/programming_language_learning_curves.md">Learning Curves (for different programming languages)</a>라는 글에 보면 여러 언어의 학습과정에서 나타다는 다양한 특징을 그래프로 보여줍니다. 그 중에 Haskell의 경우 Monad의 대한 이해 과정을 거치기 전과 후가 확연하게 차이가 나는 것을 볼 수 있습니다.</p>
+
+<p><img src="/files/monad-haskell-learning-curves.png" alt="Haskell 학습 곡선" /></p>
+
+<p>이 글에서는, 필자가 Monad를 이해하기 위해 겪었던 방황 - 혼돈, 의문, 좌절 - 과 적응, 마침내 갖고놀기에 이르는 과정을 소개하고, Scala의 <a href="http://docs.scala-lang.org/overviews/core/futures.html">Future</a>를 이용한 예제를 통해 Monad에 한발짝 다가가 보려고 합니다.</p>
+
+<h2 id="monad-방황기">Monad 방황기</h2>
+
+<p>Monad 공부의 시작은 늘 그랬듯이 <a href="https://www.google.co.kr/search?q=monad">구글링을 통한 검색</a>이었습니다. 구글의 <a href="https://ko.wikipedia.org/wiki/%ED%8E%98%EC%9D%B4%EC%A7%80%EB%9E%AD%ED%81%AC">페이지 랭크 알고리즘</a>이 추천해주는 링크를 따라서 생각없이 위키피디아의 [Monad (category theory)][1]로 첫 문을 열었죠:</p>
+
+<p><img src="/files/monad-wikipedia.png" alt="위키피디아의 Monad 페이지(일부)" /></p>
+
+<blockquote>
+  <p><img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwHaq4FJCveCBKCNZV-bZscw_/09632d0f859f20907e11d3d4ec51e95b1667fc7b08261b4c493670baa83d5cb9" class="pull-right" />
+<code class="highlighter-rouge">방황</code></p>
+
+  <p>“이건 뭐지… 알 수 없는 말들 뿐… 내가 전공이 수학과가 아니라서 그런거야, 난 개발자니까 프로그래밍으로 된걸 보면 이해가 될거야”라고 생각했지만…</p>
+</blockquote>
+
+<p>Monad와 연관 검색어로 같이 등장하는 게 Haskell이었다. 이번엔 Haskell 공식 홈페이지의 <a href="https://github.com/Dobiasd/articles/blob/master/programming_language_learning_curves.md">Monad tutorial</a>을 읽어 보았습니다:</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- The Monad class defines two basic operators: &gt;&gt;= (bind) and return.</span>
+
+<span class="kr">infixl</span> <span class="mi">1</span>  <span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">&gt;&gt;=</span>
+<span class="kr">class</span>  <span class="kt">Monad</span> <span class="n">m</span>  <span class="kr">where</span>
+  <span class="p">(</span><span class="o">&gt;&gt;=</span><span class="p">)</span>            <span class="o">::</span> <span class="n">m</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">m</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">m</span> <span class="n">b</span>
+  <span class="p">(</span><span class="o">&gt;&gt;</span><span class="p">)</span>             <span class="o">::</span> <span class="n">m</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">m</span> <span class="n">b</span> <span class="o">-&gt;</span> <span class="n">m</span> <span class="n">b</span>
+  <span class="n">return</span>           <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">m</span> <span class="n">a</span>
+  <span class="n">fail</span>             <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="n">m</span> <span class="n">a</span>
+
+<span class="n">m</span> <span class="o">&gt;&gt;</span> <span class="n">k</span>           <span class="o">=</span>  <span class="n">m</span> <span class="o">&gt;&gt;=</span> <span class="nf">\</span><span class="kr">_</span> <span class="o">-&gt;</span> <span class="n">k</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwHaq4FJCveCBKCNZV-bZscw_/477c52636630bc15b2890bde099cba0a1667fc7b08261b4c493670baa83d5cb9" class="pull-right" />
+<code class="highlighter-rouge">혼돈</code></p>
+
+  <p>“이 알 수 없는 화살표와 심볼들은 뭐지? 아직 내가 Haskell을 잘 몰라서 그런거야, 내가 조금 더 익숙한 언어로 된 설명을 보면 되겠지”라고 생각했지만…</p>
+</blockquote>
+
+<p>이번엔 Javascript를 활용한 Monad를 설명해 놓은 글(<a href="https://curiosity-driven.org/monads-in-javascript">Monad in Javascript</a>, <a href="http://haruair.com/blog/2986">번역글</a>)이 있었다. Javascript면 문법도 단순하고 쉽게 이해할 수 있을거라 생각했지만…</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 타입 스크립트로 Monad의 인터페이스를 설계함</span>
+<span class="kr">interface</span> <span class="nx">MStatic</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c1">// constructor that wraps value</span>
+    <span class="k">new</span><span class="p">(</span><span class="na">value</span><span class="p">:</span> <span class="nx">T</span><span class="p">):</span> <span class="nx">M</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">M</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c1">// bind as an instance method</span>
+    <span class="nx">bind</span><span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="na">transform</span><span class="p">:</span> <span class="p">(</span><span class="na">value</span><span class="p">:</span> <span class="nx">T</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">M</span><span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">M</span><span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><code class="highlighter-rouge">의문</code>
+<img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwHaq4FJCveCBKCNZV-bZscw_/89caada5a1ddde2795b892cae089b4da1667fc7b08261b4c493670baa83d5cb9" class="pull-right" /></p>
+
+  <p>방황과 혼돈을 겪고나서 “unit과 bind는 어렴풋이 알겠는데 이걸가지고 뭘하라는거지? 어떻게 활용하고 이게 왜 필요한거지?” 라는 의문이 들기 시작했다.</p>
+</blockquote>
+
+<p>아직 내가 Monad에 대해서 이해를 못하고 있어서 그런 것 같아 더 쉬운 설명서를 찾아보기로 했습니다.</p>
+
+<p>이번엔 그림으로 설명하는 Monad<strong>s</strong>(<a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">Functors, Applicatives, And Monads In Pictures</a>, <a href="http://lazyswamp.tistory.com/entry/functorsapplicativesandmonadsinpictures">번역글</a>)를 보았습니다:</p>
+
+<p><img src="/files/monad-functor-applicative.png" alt="그림으로 설명하는 Monads" /></p>
+
+<blockquote>
+  <p><img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwHaq4FJCveCBKCNZV-bZscw_/0ca8154bc95d4feab40064374cd9aeca1667fc7b08261b4c493670baa83d5cb9" class="pull-right" />
+<code class="highlighter-rouge">좌절</code></p>
+
+  <p>“Monad에 대해서 이해하려고 여기까지 왔는데… Monad만 점령하면 될 줄 알았는데… Functor와 Applicative란 개념이 있었다니 ㅠㅠ 이 용어들은 또 뭐지? 아… 함수형 언어의 길은 멀고도 험난하구나…” OTL</p>
+</blockquote>
+
+<h2 id="monad-적응기">Monad 적응기</h2>
+
+<p>나름 많은 글과 자료를 보았지만 추상적인 Monad의 개념을 이해하기에는 역부족이었습니다. 선생님이 필요했죠.</p>
+
+<p>Scala 공부하는데 있어서 바이블로 불리는 <a href="https://www.coursera.org/">Coursera</a>의 두 개의 Scala 과정:</p>
+
+<ul>
+  <li><a href="https://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a></li>
+  <li><a href="https://www.coursera.org/course/reactive">Principles of Reactive Programming</a></li>
+</ul>
+
+<p>을 통해서 Scala의 창시자인 <a href="https://en.wikipedia.org/wiki/Martin_Odersky">Martin Ordersky</a>와 Rx, Linq의 설계자인 <a href="https://en.wikipedia.org/wiki/Erik_Meijer_(computer_scientist)">Eric Meijer</a>의 가르침을 받았습니다.</p>
+
+<p>Martin Ordersky는 대학 교수님답게 모나드의 수학적인 기초와 이를 Scala로 예를 들어가면서 차근차근 알려줍니다:</p>
+
+<p><img src="/files/monad-martin.png" alt="Martin Ordersky의 Monad의 3개의 법칙에 대한 설명(일부)" /></p>
+
+<p>또한 Eric Meijer는 <a href="http://www.zdnet.co.kr/column/column_view.asp?artice_id=20151214081719">어둠의 해커 출신</a>답게, 개발자에게 좀 더 친숙하게 실용적인 측면에서의 모나드를 활용한 프로그래밍을 - 모나드를 사용하면 어떤게 좋아진다는 걸 - 알려줍니다:</p>
+
+<p><img src="/files/monad-eric.png" alt="Eric Meijer의 Try[T] 타입에 대한 설명(일부)" /></p>
+
+<p>Eric Meijer는 <a href="https://channel9.msdn.com/Series/C9-Lectures-Erik-Meijer-Functional-Programming-Fundamentals/Lecture-Series-Erik-Meijer-Functional-Programming-Fundamentals-Chapter-1">MS에서 Haskell을 이용한 함수형 언어 강좌</a>를 꾸준히 했었고, 현재 edx.org에서도 <a href="https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0">Introduction to Functional Programming</a>이란 주제로 강의를 하고 있습니다.</p>
+
+<blockquote>
+  <p><code class="highlighter-rouge">괴담</code>
+<img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwHaq4FJCveCBKCNZV-bZscw_/01a3b97731f42b4efc929ebd7fa376431667fc7b08261b4c493670baa83d5cb9" class="pull-right" /></p>
+
+  <p>Cousera 강의를 듣고 과제를 풀고 실제 함수형 언어를 사용하면서 Monad의 문이 열리고 이해가 되기 시작했습니다. 정확하게 말하면 Monad를 이해했다기 보다는 사용할 줄 안다는 표현이 맞을 것 같네요.
+이제 <a href="https://e.xtendo.org/haskell/ko/monad_fear/slide">모나드 괴담</a>은 괴담일 뿐~</p>
+</blockquote>
+
+<h2 id="monad-가지고-놀기">Monad 가지고 놀기</h2>
+
+<p>Monad에 대해서 몰라도 됩니다. Monad를 배운다는데 Monad에 대해서 몰라도 된다니 모순된 말이죠. 하지만 실제 Monad에 대한 이해가 없어도 Monad 프로그래밍을 할 수 있습니다.</p>
+
+<p>그럼 비동기 프로그램을 Monad를 이용해서 구현해보겠습니다.
+구현에는 Scala의 <a href="http://www.scala-lang.org/api/current/#scala.concurrent.Future">Future[T]</a>라는 타입을 사용합니다.
+Future를 활용한 다양한 함수를 조합하는 프로그래밍을 할 것이고 그것이 첫번째 Monad를 활용한 프로그래밍이 될 것입니다.</p>
+
+<p>이제 잠시 Monad란 용어를 쓰지 않겠습니다. 아니, 쓸 필요가 없을 겁니다.</p>
+
+<h3 id="scala-future에-대해서-알아보기">Scala Future에 대해서 알아보기</h3>
+
+<p><a href="http://www.scala-lang.org/api/current/#scala.concurrent.Future">Scala 공식 API문서</a>에 보면 Future에 대한 설명은 간단합니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Asynchronous computations that yield futures are created with the Future call
+</span>
+<span class="k">val</span> <span class="n">s</span> <span class="k">=</span> <span class="s">"Hello"</span>
+<span class="k">val</span> <span class="n">f</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Future</span> <span class="o">{</span>
+  <span class="n">s</span> <span class="o">+</span> <span class="s">" future!"</span>
+<span class="o">}</span>
+<span class="n">f</span> <span class="n">onSuccess</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="n">msg</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">Future</code>는 이름 그대로 미래의 값을 저장하고 있는 객체라 생각하면 됩니다. <code class="highlighter-rouge">Future</code>에 저장되어 있는 값은 특정 연산(IO, CPU)이 끝나고 반환되는 시점에 그 값을 얻을 수 있습니다. 설명은 이것으로 충분합니다. <code class="highlighter-rouge">Future</code>의 다른 부가적인 API들은 차근차근 알아가면 됩니다. 한 번에 다 알 필요가 없습니다.</p>
+
+<h3 id="scala-future로-비동기-프로그래밍하기">Scala Future로 비동기 프로그래밍하기</h3>
+
+<p>쇼핑몰에서 유저가 주문정보페이지를 통해 주문내역을 조회 할 수 있는 프로그램을 구현해보겠습니다. 실제 구현은 이보다 복잡하겠지만, 최소한의 핵심 기능과 동기화 프로그래밍에서 발생하는 <em>Blocking I/O</em>를 중심으로 그려보면 아래와 같습니다:</p>
+
+<p><img src="/files/monad-order-view-flow.png" alt="주문 상품 내역 조회 Flow - Blocking I/O" /></p>
+
+<p>이 <em>Blocking I/O</em> 구간을 <em>Non Blocking I/O</em>로 바꿔 보겠습니다.</p>
+
+<h4 id="step-0---nio를-사용할수-있는-http-client-선택">Step 0 - NIO를 사용할수 있는 Http Client 선택</h4>
+
+<p>NIO를 활용하기 위해서는 다양한 라이브러리 혹은 프레임웍의 지원을 확인해보고 필요에 따라 선택하여 사용하면 됩니다:</p>
+
+<ul>
+  <li><a href="https://github.com/AsyncHttpClient/async-http-client">Netty Async Http Client</a></li>
+  <li><a href="http://twitter.github.io/finagle/guide/Clients.html">Finagle Client - Http</a></li>
+  <li><a href="http://doc.akka.io/docs/akka-stream-and-http-experimental/2.0.3/scala/http/client-side/index.html">Akka Http(Client-Side)</a></li>
+  <li><a href="https://www.playframework.com/">Play Framework</a></li>
+</ul>
+
+<p>그 외 많은 오픈 소스 프로젝트가 NIO를 지원하고 정말 원한다면 Java의 <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/package-summary.html">NIO API</a>를 직접 사용할 수도 있습니다.</p>
+
+<p>하지만… 참기로 했습니다.</p>
+
+<p><img src="/files/monad-reinventing-the-wheel.png" class="hcenter" /></p>
+<ul>
+  <li>이미지 출처: <a href="http://www.inspirewins.com/blog/are-you-guilty-of-being-a-proposal-caveman">
+Are you guilty of being a proposal caveman?</a></li>
+</ul>
+
+<h4 id="step-1---async-interface를-정의">Step 1 - Async interface를 정의</h4>
+
+<p>NIO로 데이터를 가져오기 때문에 모든 결과값은 <code class="highlighter-rouge">Future</code>에 담겨져서 옵니다:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 세션 정보를 이용하여 유저 정보를 가져옴
+</span><span class="k">def</span> <span class="n">getUser</span><span class="o">(</span><span class="n">session</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">User</span><span class="o">]</span> <span class="k">=</span> <span class="n">userApi</span><span class="o">.</span><span class="n">getAsync</span><span class="o">(</span><span class="n">session</span><span class="o">)</span>
+
+<span class="c1">// 특정 유저의 주문 정보를 가져옴
+</span><span class="k">def</span> <span class="n">getOrder</span><span class="o">(</span><span class="n">userId</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Order</span><span class="o">]</span> <span class="k">=</span> <span class="n">orderApi</span><span class="o">.</span><span class="n">getAsync</span><span class="o">(</span><span class="n">userId</span><span class="o">)</span>
+
+<span class="c1">// 특정 주문의 상품 내역을 가져옴
+</span><span class="k">def</span> <span class="n">getOrderItems</span><span class="o">(</span><span class="n">orderId</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]</span> <span class="k">=</span> <span class="n">itemApi</span><span class="o">.</span><span class="n">getAsync</span><span class="o">(</span><span class="n">orderId</span><span class="o">)</span>
+</code></pre></div></div>
+
+<h4 id="step-2---blocking-io-with-awaitresult">Step 2 - Blocking IO with Await#result</h4>
+
+<p>위에 정의된 함수들을 조합해서 주문 상품 내역을 가져와 보겠습니다. <code class="highlighter-rouge">Future</code>에 값이 들어 있기 때문에 이를 가져오기 위해서 <code class="highlighter-rouge">Await#result</code>를 활용했습니다:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 유저 정보를 가져옴
+</span><span class="k">val</span> <span class="n">userFuture</span> <span class="k">=</span> <span class="n">getUser</span><span class="o">(</span><span class="n">user_session</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">user</span> <span class="k">=</span> <span class="nc">Await</span><span class="o">.</span><span class="n">result</span><span class="o">(</span><span class="n">userFuture</span><span class="o">,</span> <span class="n">timeout</span><span class="o">)</span>  <span class="c1">// Thread waiting during I/O
+</span>
+<span class="c1">// 주문 정보를 가져옴
+</span><span class="k">val</span> <span class="n">orderFuture</span> <span class="k">=</span> <span class="n">getOrder</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">order</span> <span class="k">=</span> <span class="nc">Await</span><span class="o">.</span><span class="n">result</span><span class="o">(</span><span class="n">orderFuture</span><span class="o">,</span> <span class="n">timeout</span><span class="o">)</span>  <span class="c1">// Thread waiting during I/O
+</span>
+<span class="c1">// 특정 주문의 상품 내역을 가져옴
+</span><span class="k">val</span> <span class="n">itemsFuture</span> <span class="k">=</span> <span class="n">getOrderItems</span><span class="o">(</span><span class="n">order</span><span class="o">.</span><span class="n">id</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">items</span> <span class="k">=</span> <span class="nc">Await</span><span class="o">.</span><span class="n">result</span><span class="o">(</span><span class="n">itemsFuture</span><span class="o">,</span> <span class="n">timeout</span><span class="o">)</span>  <span class="c1">// Thread waiting during I/O
+</span><span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">"## User Order Items : ${items}"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>위의 코드를 보면 함수형 스타일이 아니라 절차 지향 스타일의 프로그래밍이 되었고 NIO Client를 사용하였지만 <code class="highlighter-rouge">Await#result</code> 함수 호출을 통해서 <em>Blocking I/O</em>가 발생했습니다. 아직은 비동기 프로그래밍이 아니죠.</p>
+
+<h4 id="step-3---flatmap-연산자를-이용한-함수-합성">Step 3 - flatMap 연산자를 이용한 함수 합성</h4>
+
+<p><code class="highlighter-rouge">Await#result</code>를 사용하지 않고 3개의 Future를 반환하는 함수를 엮어서 1개의 Future의 결과 <code class="highlighter-rouge">Future[List[Item]]</code>을 얻을 수 있습니다:</p>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// flatMap을 이용한 3개의 future를 compostion해서 결과를 얻을 수 있습니다.
+</span>
+<span class="k">val</span> <span class="n">itemsFuture</span> <span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]</span> <span class="k">=</span>
+  <span class="n">getUser</span><span class="o">(</span><span class="n">user_session</span><span class="o">).</span><span class="n">flatMap</span> <span class="o">{</span> <span class="k">case</span> <span class="n">user</span> <span class="k">=&gt;</span>
+    <span class="n">getOrder</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="o">).</span><span class="n">flatMap</span> <span class="o">{</span> <span class="k">case</span> <span class="n">order</span> <span class="k">=&gt;</span>
+      <span class="n">getOrderItems</span><span class="o">(</span><span class="n">order</span><span class="o">.</span><span class="n">id</span><span class="o">)</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+<span class="n">itemsFuture</span><span class="o">.</span><span class="n">foreach</span> <span class="o">{</span> <span class="n">items</span> <span class="k">=&gt;</span>
+  <span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">"## User Order Items : ${items}"</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>여기서 <code class="highlighter-rouge">flatMap</code>은 <code class="highlighter-rouge">Future</code>에서 값이 들어올 때 해당 블록 <code class="highlighter-rouge">{ ... }</code> 호출하여 비동기 연산이 연속적으로 가능하게 합니다. 이는 Javascript에서 자주 사용하는 <code class="highlighter-rouge">Promise</code>의 <code class="highlighter-rouge">then</code> 함수와 유사합니다. 결과 값이 반환될 때 동작할 함수, callback을 등록해 놓는 방식이죠:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$http</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/v1/api/some/path/'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">// flatMap과 같은 역할을 합니다.</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Callback? Callback!! Callback 패턴은 <a href="http://callbackhell.com/">Callback Hell</a>이라 불리는 악명 높은 Anti-pattern 아닌가?</p>
+
+<p><img src="/files/monad-callback-hell.gif" class="hcenter" /></p>
+<ul>
+  <li>이미지 출처: <a href="http://icompile.eladkarako.com/javascript-controllable-multiple-jquery-callback-hell/">JavaScript - Controllable, Multiple jQuery - Callback Hell</a></li>
+</ul>
+
+<h4 id="step-4---for-comprehension을-이용한-함수-합성">Step 4 - for comprehension을 이용한 함수 합성</h4>
+
+<p>Scala는 <a href="http://docs.scala-lang.org/tutorials/tour/sequence-comprehensions.html">for comprehension</a>을 통해서 Callback hell에서 벗어날 멋진 방법을 제공해주고 있습니다. <a href="https://gist.github.com/loicdescotte/4044169">관련 내용</a>는 구글링을 통해서 금방 찾을 수 있습니다. 이제 <code class="highlighter-rouge">flatMap</code>의 <code class="highlighter-rouge">callback(lambda)</code> 방식을 사용하지 않고 코드를 고쳐 보겠습니다:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// for comprehension을 이용하여 callback을 사용하지 않고 3개의 함수를 합성하였다.
+</span><span class="k">val</span> <span class="n">itemsFuture</span> <span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+  <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">getUserId</span><span class="o">(</span><span class="n">user_session</span><span class="o">)</span>
+  <span class="n">order</span> <span class="k">&lt;-</span> <span class="n">getOrder</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="o">)</span>
+  <span class="n">items</span> <span class="k">&lt;-</span> <span class="n">getOrderItems</span><span class="o">(</span><span class="n">order</span><span class="o">.</span><span class="n">id</span><span class="o">)</span>
+<span class="o">}</span> <span class="k">yield</span> <span class="n">items</span>
+
+<span class="n">itemsFuture</span><span class="o">.</span><span class="n">map</span> <span class="o">{</span> <span class="n">items</span> <span class="k">=&gt;</span>
+  <span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">"## User Order Items : ${items}"</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>위의 <code class="highlighter-rouge">flatMap</code>을 활용한 코드보다 간결해졌고 가독성 좋고, 유지보수 쉬운 좋은 코드로 바뀌었습니다.</p>
+
+<p>동기 코드를 작성할 때의 flow와 비슷하게 작성한 비동기 코드를 조금 더 개선하고 싶군요.</p>
+
+<h4 id="step-5---scala-async-await-이용한-보다-간단한-비동기-프로그래밍">Step 5 - Scala async, await 이용한 보다 간단한 비동기 프로그래밍</h4>
+
+<p><a href="https://github.com/scala/async">Scala Async</a>를 활용해보겠습니다. 이를 적용할려면 의존성이 추가되어야 하기때문에 <code class="highlighter-rouge">build.sbt</code>에 아래와 같이 추가해야 합니다:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">libraryDependencies</span> <span class="o">+=</span> <span class="s">"org.scala-lang.modules"</span> <span class="o">%%</span> <span class="s">"scala-async"</span> <span class="o">%</span> <span class="s">"0.9.5"</span>
+</code></pre></div></div>
+
+<p>의존성 추가 후에 아래와 같이 <code class="highlighter-rouge">async</code>와 <code class="highlighter-rouge">await</code> 키워드를 사용하여 비동기 프로그래밍을 동기 프로그래밍과 비슷하게 할 수 있습니다:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">scala.async.Async.</span><span class="o">{</span><span class="n">async</span><span class="o">,</span> <span class="n">await</span><span class="o">}</span>
+
+<span class="c1">// non blocking 영역이 된다.
+</span><span class="n">async</span> <span class="o">{</span>
+  <span class="c1">// async 영역 안에서의 await는 thread를 blocking 하지 않는다.
+</span>  <span class="k">val</span> <span class="n">user</span> <span class="k">=</span> <span class="n">await</span><span class="o">(</span><span class="n">getUser</span><span class="o">(</span><span class="n">userSession</span><span class="o">))</span>
+  <span class="k">val</span> <span class="n">order</span> <span class="k">=</span> <span class="n">await</span><span class="o">(</span><span class="n">getOrder</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="o">))</span>
+  <span class="k">val</span> <span class="n">items</span> <span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]</span> <span class="k">=</span> <span class="n">await</span><span class="o">(</span><span class="n">getOrderItems</span><span class="o">(</span><span class="n">order</span><span class="o">.</span><span class="n">id</span><span class="o">))</span>
+  <span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">"## User Order Items : ${items}"</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="무엇이-monad인가">무엇이 Monad인가?</h2>
+
+<p>우리가 비동기 프로그램을 위해서 사용한 <code class="highlighter-rouge">Future</code>가 Monad의 일종입니다.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">unit</code> - Monad는 특정 값에 대한 감싸기 규칙을 만듭니다.</li>
+  <li><code class="highlighter-rouge">bind|flatMap</code> - 감싼 값에 대해서 꺼낼 수 있는 방법을 제공합니다. 꺼낸 값을 가지고 원하는 형식으로 변형하고, 그 값을 감싸서 반환합니다.</li>
+</ul>
+
+<p>이제 우리는 Monad를 활용한 프로그래밍을 할 수 있고, 이미 해봤습니다.</p>
+
+<p>위의 예제에서:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">session</span> <span class="k">=&gt;</span> <span class="nc">Future</span><span class="o">[</span><span class="kt">User</span><span class="o">]</span>
+<span class="k">=&gt;</span> <span class="n">flatMap</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nc">User</span> <span class="k">=&gt;</span> <span class="nc">Future</span><span class="o">[</span><span class="kt">Order</span><span class="o">])</span>
+<span class="k">=&gt;</span> <span class="n">flatMap</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nc">Order</span> <span class="k">=&gt;</span> <span class="nc">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]])</span>
+</code></pre></div></div>
+
+<p>이 코드는 Monad의 flatMap 혹은 for comprehension을 통한 합성을 통해서 아래와 같이 바뀌게 됩니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">session</span> <span class="k">=&gt;</span> <span class="nc">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]</span>
+</code></pre></div></div>
+
+<p>Monad를 통한 함수 합성을 이미 한 거죠.</p>
+
+<p>특히 Scala는 Haskell의 <a href="https://en.wikibooks.org/wiki/Haskell/do_notation">do notation</a> 과 유사한 for comprehension을 통해서 여러 개의 Monad를 연결하는 syntactic sugar을 제공하고 이것도 이미 활용했습니다.</p>
+
+<h2 id="scala-future는-monad가-아니다">Scala Future는 Monad가 아니다?</h2>
+
+<p>Monad가 되려면 위의 Martin Ordersky의 강의에 나오는 3가지 법칙을 만족해야 합니다. 하지만 Scala의 <code class="highlighter-rouge">Future</code>는 결합의 법칙을 만족하지 못합니다.
+<a href="http://stackoverflow.com/questions/27454798/is-future-in-scala-a-monad">Is Future in Scala a monad?</a>란 Stackoverflow의 질문과 답변을 보면 결과적으로 <code class="highlighter-rouge">Future</code>는 return값을 cache하고, side-effect를 효과적으로 관리 못하며, 결합법칙을 만족하지 못해서 Monad가 아니므로 “Scala의 Future는 Monadic이라는 표현을 써야한다”는 군요.</p>
+
+<h3 id="scalaz-task---monad의-법칙을-만족하는-future">Scalaz Task - Monad의 법칙을 만족하는 Future</h3>
+
+<p>Monad의 법칙을 만족하기 위해서 <a href="https://github.com/scalaz/scalaz">Scalaz</a>의 <a href="http://timperrett.com/2014/07/20/scalaz-task-the-missing-documentation/">Task</a>를 사용하면 됩니다.</p>
+
+<h4 id="scala-future-vs-scalaz-task">Scala Future vs. Scalaz Task</h4>
+
+<p>Scalaz의 <code class="highlighter-rouge">Task</code>와 Scala의 <code class="highlighter-rouge">Future</code>은 return 값을 cache 하는 방식 이외에도 callback에 대한 처리 방식도 차이가 납니다.</p>
+
+<ul>
+  <li>Scala Future : <code class="highlighter-rouge">futureA.flatMap(a =&gt; futureB)</code> 은 다른 thread에서 futureB가 실행됩니다:</li>
+</ul>
+
+<p><img src="/files/monad-scala-future-callback.png" alt="Scala Future의 callback 처리 방식" /></p>
+
+<ul>
+  <li>Scalaz Task :  <code class="highlighter-rouge">taskA.flatMap(a =&gt; taskB)</code>는 taskA와 같은 thread에서 taskB가 실행되어 context switching를 줄이는 최적화 기법도 적용되어 있습니다:</li>
+</ul>
+
+<p><img src="/files/monad-scalaz-task-callback.png" alt="Scalaz Task의 callback 처리 방식" /></p>
+
+<h4 id="scala-future-vs-scalaz-task-성능-비교">Scala Future vs. Scalaz Task 성능 비교</h4>
+
+<p>벤치마크를 보면 trampoline과 그에 대한 optimize에 대해서 성능이 많이 차이나는 것을 확인할 수 있습니다.</p>
+
+<p><img src="/files/monad-future-task-plot.png" alt="Scala Future vs. Scalaz Task 성능 비교" /></p>
+
+<p>자세한 내용은 <a href="http://blog.higher-order.com/blog/2015/06/18/easy-performance-wins-with-scalaz/">Higher Order 블로그의 Easy Performance Wins With Scalaz 포스트</a>를 참조하세요.</p>
+
+<h2 id="scala의-monads">Scala의 Monads</h2>
+
+<p>Monad 개념 때문에 어려워 말고, 다른 API처럼 사용하면 됩니다. 물론 개념을 자세히 알면 도움이 되겠지만 반대로 <code class="highlighter-rouge">flatMap</code> API를 사용하다 보면 Monad에 대한 이해가 늘어납니다.</p>
+
+<p>Scala에는 많은 타입이 <code class="highlighter-rouge">flatMap</code>과 for comprehention을 활용할 수 있는 <code class="highlighter-rouge">Monad | Monadic</code> 타입입니다:</p>
+
+<ul>
+  <li>Option[T]</li>
+  <li>Try[T] - 이것도 결합의 법칙은 만족하지는 못합니다. Cousera 강의에서 Martin Ordersky가 설명해줍니다.</li>
+  <li>List[T]</li>
+  <li>Future[T]</li>
+</ul>
+
+<p>그 외 타입에 <code class="highlighter-rouge">flatMap</code> 함수가 있다면 Monad라 생각해도 크게 무리는 없을듯 합니다.</p>
+
+<p>Monad의 대한 보다 자세한 내용은 위에 언급한 Cousera 강좌 <a href="http://eed3si9n.com/learning-scalaz/">Learning Scalaz</a>, 그리고 친철히 예제와 함께 자세히 한글로 설명해주신 오현석님의 <a href="https://github.com/enshahar/BasicFPinScala/blob/master/Intermediate/Monad.md">enshahar/BasicFPinScala</a>의 문서가 좋은 참고 자료가 될 것입니다. 또한 인터넷에서 <a href="https://en.wikipedia.org/wiki/Massive_open_online_course">MOOC</a> 강좌를 열심히 들으면 <code class="highlighter-rouge">Certification</code>을 받을수 있습니다. :)</p>
+
+<p><img src="https://github.com/ikhoon/FP101x/raw/master/fp101x-certification.jpg" alt="edx.org의 Introduction to Functional Programming 수업 수료후 받음" />
+[1]: https://en.wikipedia.org/wiki/Monad_(category_theory)</p>
+
+<blockquote>
+  <p>이 글은 카카오톡 선물하기 개발팀의 <a href="https://github.com/ikhoon">liam.m</a>이 사내 게시판에 올린 글을 저자의 동의를 얻어 옮긴 것입니다. 최근엔 <a href="https://www.facebook.com/groups/258756680905752">페이스북 그룹 2^4+2</a>에 자주 출몰해서 다양한 지식과 정보를 나눠주고 있습니다.</p>
+</blockquote>
+
+<p><img src="https://gift-talk.kakao.com/public/angular_webapp/dist/images/wishes/bg_nodata.gif" class="hcenter" /></p>
+
+<ul>
+  <li>커버 이미지 출처: <a href="https://flic.kr/p/4k5Xvp">monad</a> © <a href="https://www.flickr.com/photos/icanchangethisright/">Bradley Gordon</a></li>
+</ul>
+</div>
+  <div id="post-footer">
+    
+    <a id="post-author" href="/authors/liam.m/">
+      <div id="author-image" style="background-image:url(/files/authors/liam.m.jpg);">
+        <span class="sr-only">liam.m's profile image</span>
+      </div>
+      <p id="author-name">liam.m</p>
+    </a>
+    <p id="post-date">2016-03-03 10:49</p>
+    <a id="post-more" href="/authors/liam.m/">
+      <span>Read more posts by this author</span>
+    </a>
+  </div>
+</div>
+
+<div class="container" style="margin-top:25px; padding:0px">
+  <a href="https://www.welcomekakao.com" target="_blank"><img src="/files/career2020.jpg" style="width:100%;"></a>
+</div>
+
+<div id="post-links" class="container">
+  
+  
+  <div id="post-prev" style="background-image: url(/files/covers/dashboard.jpg);" >
+    <div>
+      <h3><a href="/2016/03/03/vim-github-dashboard/">그래, 가끔 "Vim에서" GitHub을 보자!</a></h3>
+      <p>YOU MIGHT ENJOY</p>
+    </div>
+  </div>
+  
+  
+  
+  <div id="post-next" style="background-image: url(/files/covers/observatory.jpg);" >
+    <div>
+      <h3><a href="/2016/03/11/redis-scan/">Redis의 SCAN은 어떻게 동작하는가?</a></h3>
+      <p>NEXT POST</p>
+    </div>
+  </div>
+  
+</div>
+
+<div id="lightbox">
+  <div id="lightbox-image"></div>
+</div>
+
+    <div class="clearfix"></div>
+
+    <a href="#" id="back-to-top"></a>
+</div>
+
+<div id="footer" class="container-fluid">
+    <ul id="links">
+        
+        <li>
+            <a id="link-github" href="http://github.com/kakao" target="_blank">
+                <span class="sr-only">github</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-facebook" href="http://facebook.com/nkakao" target="_blank">
+                <span class="sr-only">facebook</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-twitter" href="http://twitter.com/kakaodev" target="_blank">
+                <span class="sr-only">twitter</span>
+            </a>
+        </li>
+        
+        <li>
+            <a id="link-rss" href="/rss" target="_blank">
+                <span class="sr-only">rss</span>
+            </a>
+        </li>
+    </ul>
+    <ul id="footer-menu">
+        <li><a href="//www.kakaocorp.com">Kakao</a></li>
+        <li><a href="//careers.kakao.com/jobs">Jobs</a></li>
+        <li><a href="//privacy.kakaocorp.com">Privacy</a></li>
+    </ul>
+    <p id="copyright">
+        <a href="//www.kakaocorp.com">Copyright &copy; Kakao Corp.</a>
+        All rights reserved.
+    </p>
+</div><!--#footer-->
+
+
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-72007721-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+
+    <script type='text/javascript'>
+   //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    //Kakao.init('65d48e116d8b9409e08960c4800c3017');
+    function shareStory(abs_page_url) {
+        Kakao.Story.share({
+            url: abs_page_url,
+            text: '카카오 기술블로그 #개발자 #카카오'
+        });
+    }
+    //]]>
+</script>
+
+    
+    <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1204347326263800',
+    xfbml      : true,
+    version    : 'v2.7'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+    
+
+    
+    <script>!function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    }(document, 'script', 'twitter-wjs');
+</script>
+
+    
+
+    
+    <script src="https://apis.google.com/js/platform.js" async defer>
+    {
+        lang: 'ko'
+    }
+</script>
+
+    
+
+</body>
+</html>

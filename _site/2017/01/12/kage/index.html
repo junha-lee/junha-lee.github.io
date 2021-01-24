@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+
+
+<title>대규모 분산 스토리지(Kage)의 발전과정</title>
+<meta name="title" content="대규모 분산 스토리지(Kage)의 발전과정" />
+<meta name="author" content="justin.bv"/>
+<meta name="description" content="Overview 대부분의 초기 스타트업은 컨텐츠를 저장할 저장소에 대한 별다른 고민을 하지 않습니다. 여유가 있다면 NAS 장비를 구매해서 사용하고, 아니라면 NFS와 RAID를 구성해서 사용하게 됩니다. 하지만 서비스가 점점 커짐에 따라 하루 동안 저장되는 컨텐츠의 용량이 커지고, 네트워크 트래픽과 디스크 I/O가 증가하면서 NFS, NAS로는 유지가 불가능한 상황에 처하게 됩니다. 구글(GFS, 2003)1과 페이스북(Haystack, 2011)2도 비슷한 상황을 겪었고 자체적으로 스토리지 시스템을 만들어 서비스를 유지시키는 데 성공하였습니다. 카카오 역시 초창기엔 카카오톡에서 주고받는 이미지와 동영상들을 모두 NAS에 저장하는 방식을 채택하였지만 이용자..."/>
+
+<meta property="fb:app_id" content="1204347326263800"/>
+
+<meta property="og:site_name" content="kakao 기술 블로그"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="대규모 분산 스토리지(Kage)의 발전과정"/>
+<meta property="og:description" content="Overview 대부분의 초기 스타트업은 컨텐츠를 저장할 저장소에 대한 별다른 고민을 하지 않습니다. 여유가 있다면 NAS 장비를 구매해서 사용하고, 아니라면 NFS와 RAID를 구성해서 사용하게 됩니다. 하지만 서비스가 점점 커짐에 따라 하루 동안 저장되는 컨텐츠의 용량이 커지고, 네트워크 트래픽과 디스크 I/O가 증가하면서 NFS, NAS로는 유지가 불가능한 상황에 처하게 됩니다. 구글(GFS, 2003)1과 페이스북(Haystack, 2011)2도 비슷한 상황을 겪었고 자체적으로 스토리지 시스템을 만들어 서비스를 유지시키는 데 성공하였습니다. 카카오 역시 초창기엔 카카오톡에서 주고받는 이미지와 동영상들을 모두 NAS에 저장하는 방식을 채택하였지만 이용자..."/>
+<meta property="og:url" content="http://localhost:4000/2017/01/12/kage/"/>
+<meta property="og:image" content="http://localhost:4000/files/covers/kage-idc.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="대규모 분산 스토리지(Kage)의 발전과정"/>
+<meta name="twitter:description" content="Overview 대부분의 초기 스타트업은 컨텐츠를 저장할 저장소에 대한 별다른 고민을 하지 않습니다. 여유가 있다면 NAS 장비를 구매해서 사용하고, 아니라면 NFS와 RAID를 구성해서 사용하게 됩니다. 하지만 서비스가 점점 커짐에 따라 하루 동안 저장되는 컨텐츠의 용량이 커지고, 네트워크 트래픽과 디스크 I/O가 증가하면서 NFS, NAS로는 유지가 불가능한 상황에 처하게 됩니다. 구글(GFS, 2003)1과 페이스북(Haystack, 2011)2도 비슷한 상황을 겪었고 자체적으로 스토리지 시스템을 만들어 서비스를 유지시키는 데 성공하였습니다. 카카오 역시 초창기엔 카카오톡에서 주고받는 이미지와 동영상들을 모두 NAS에 저장하는 방식을 채택하였지만 이용자..."/>
+<meta name="twitter:label1" content="Written by"/>
+<meta name="twitter:data1" content="justin.bv"/>
+<meta name="twitter:image:src" content="http://localhost:4000/files/covers/kage-idc.jpg"/>
+
+<meta name="twitter:label2" content="Filed under"/>
+<meta name="twitter:data2" content="storage"/>
+
+<meta property="article:tag" content="storage"/>
+
+
+
+<meta property="article:published_time" content="2017-01-12T14:00:00+09:00"/>
+
+
+<meta property="article:author" content="http://localhost:4000/authors/justin.bv"/>
+
+<link href="http://localhost:4000/rss/" rel="alternate" type="application/rss+xml" title="RSS"/>
+<link href="/assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" type="image/png"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon-precomposed" type="image/png"/>
+<link href="/assets/lib/normalize.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/css/monokai.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/lib/magnific-popup.min.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/fonts/Kakao.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/css/screen.css" rel="stylesheet" type="text/css"/>
+<script>
+    if (window.location.host.indexOf('tech.kakao.com') > -1 && window.location.protocol == "https:"){
+        window.location = window.location.toString().replace(/^https:/, "http:");
+    }
+</script>
+
+</head>
+<body class="post-template">
+
+<div id="header">
+    <button id="menu-toggle" type="button">
+        <span class="sr-only">Toggle Navigation Menu</span>
+    </button>
+    <button id="search-toggle" type="button">
+        <span class="sr-only">Toggle Search Form</span>
+    </button>
+    <a id="logo" href="/">
+        <span class="sr-only">KakaoTech</span>
+    </a>
+    <div id="search">
+        <input id="search-input" type="search" placeholder="Search..." value="" />
+    </div>
+    <ul class="search__results" id="results-container"></ul>
+
+    <ul id="menu" class="nav">
+        <li class=" active "><a href="/">블로그</a></li>
+        <li class=""><a href="/opensource/">오픈소스</a></li>
+        <li class=""><a href="/openapi/">오픈API</a></li>
+        <li class=""><a href="/events/">기술행사</a></li>
+    </ul>
+</div>
+<!-- Script pointing to jekyll-search.js -->
+<script src="/dest/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '/search2.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: '<li>No results found</li>',
+        limit: 15,
+        fuzzy: false,
+        exclude: ['Welcome']
+    })
+</script><!-- #header -->
+
+
+
+<div id="wrapper">
+    <div id="navbar" class="container">
+  <h5><a id="link-back" href="/">Back to Posts</a></h5>
+  
+<ul id="shares">
+    <li class="stalk" style="display:none">
+        <a id="kakao-link-btn" href="javascript:;"></a>
+    </li>
+    <li>
+        <a id="share-kakaostory" href="javascript:shareStory('http://localhost:4000/2017/01/12/kage/');"></a>
+    </li>
+
+    
+    <li>
+        <a id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/2017/01/12/kage/"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="sr-only">Share to Facebook</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-twitter"
+           href="https://twitter.com/intent/tweet?text=%EB%8C%80%EA%B7%9C%EB%AA%A8%20%EB%B6%84%EC%82%B0%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80(Kage)%EC%9D%98%20%EB%B0%9C%EC%A0%84%EA%B3%BC%EC%A0%95&url=http://localhost:4000/2017/01/12/kage/">
+            <span class="sr-only">Share to Twitter</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-google" href="https://plus.google.com/share?url=http://localhost:4000/2017/01/12/kage/"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+            <span class="sr-only">Share to Google+</span>
+        </a>
+    </li>
+    
+</ul>
+
+</div>
+
+<div id="cover" class="container" style="background-image: url(/files/covers/kage-idc.jpg);" >
+  <div>
+    <h1>대규모 분산 스토리지(Kage)의 발전과정</h1>
+    <p>
+      
+      <a href="/tags/storage">storage</a>
+      
+      
+    </p>
+    
+
+
+  </div>
+</div>
+
+<div id="content" class="container post" role="main">
+  <div id="post-content"><h2 id="overview">Overview</h2>
+
+<p>대부분의 초기 스타트업은 컨텐츠를 저장할 저장소에 대한 별다른 고민을 하지 않습니다. 여유가 있다면 NAS 장비를 구매해서 사용하고, 아니라면 NFS와 RAID를 구성해서 사용하게 됩니다.
+하지만 서비스가 점점 커짐에 따라 하루 동안 저장되는 컨텐츠의 용량이 커지고, 네트워크 트래픽과 디스크 I/O가 증가하면서 NFS, NAS로는 유지가 불가능한 상황에 처하게 됩니다.</p>
+
+<p>구글(GFS, 2003)<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>과 페이스북(Haystack, 2011)<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup>도 비슷한 상황을 겪었고 자체적으로 스토리지 시스템을 만들어 서비스를 유지시키는 데 성공하였습니다.
+카카오 역시 초창기엔 카카오톡에서 주고받는 이미지와 동영상들을 모두 NAS에 저장하는 방식을 채택하였지만 이용자 수와 트래픽이 늘어남에 따라 더 이상 감당할 수 없게 되었고,
+이에 확장이 용이하고 빠른 응답속도와 높은 신뢰성을 가지는 대규모 분산 스토리지 시스템을 구축하게 되었습니다.</p>
+
+<p>그리하여 탄생하게 된 것이 바로 KAGE(KAkao storaGE)입니다.</p>
+
+<p><img src="/files/kage-google-server.jpg" alt="이런 상황에서도 서비스 가능한 스토리지를 만들어보고 싶었다?! (출처: http://imgur.com)" /></p>
+
+<h2 id="introduction-of-kage">Introduction of Kage</h2>
+<p>현재 카카오톡, 카카오스토리를 포함해 카카오의 다양한 서비스를 지탱하고 있는 Kage의 주요 특징은 아래와 같습니다.</p>
+
+<ul>
+  <li>한 데이터를 3벌씩 3서버에 나누어 저장</li>
+  <li>데이터 저장 시 커다란 청크 파일 하나에 데이터를 쓴 후, 데이터의 위치가 담긴 Kage-Key를 리턴</li>
+  <li>발급받은 Kage-Key를 이용하여 저장된 데이터에 대한 읽기 및 수정이 가능.</li>
+  <li>청크에는 Expire-Time이 존재하여 일정 시간이 지나면 청크에 담긴 파일이 모두 삭제</li>
+</ul>
+
+<p>Haystack와 같은 분산 스토리지의 아키텍쳐를 알고 계신 분이라면 위 특징만 보고도 어느 정도 구조가 파악되셨을 것 같습니다만,
+Kage 역시 보통의 분산 시스템처럼 파일을 저장할 때 복제본을 생성하여 물리적으로 다른 위치에 있는 3개의 저장소에 각각 저장합니다.
+즉 원본 파일 외에도 2개의 복제본을 더 생성하여 총 3개의 파일을 저장하는 것인데,
+이러한 정책을 통해 파일 읽기에 대한 트래픽을 분산시킬 수 있으며, 장애에 대한 유연한 처리도 가능해집니다.
+만약 3개의 저장소 중 2개의 저장소에 장애가 발생하더라도, 나머지 하나의 저장소를 통해서 읽기 요청을 처리할 수 있습니다.</p>
+
+<p><img src="/files/kage-archi.png" alt="Kage Service Architecture" /></p>
+
+<p>Kage는 크게 다수의 데이터노드(Datanode) 서버와 네임노드(Namenode) 서버로 구성되는데,
+이 중 데이터노드는 실제 파일을 저장하고, 저장된 파일을 읽어서 전송하는 역할을 합니다.
+데이터노드에 있는 파일 저장소는 청크(Chunk)라는 일정한 크기를 가진 저장공간으로 이루어져 있으며,
+물리적으로 다른 서버에 있지만 논리적으로는 같은 데이터를 가지고 있는 3개의 청크를 청크셋(ChunkSet)이라고 부릅니다.</p>
+
+<p>위에서 Kage가 파일을 저장할 때 서로 다른 3개의 저장소에 복제본들을 저장한다고 하였는데,
+파일을 저장할 청크셋을 결정해주기만 하면 자연스럽게 3개의 서로 다른 저장소(= 청크)에 복제본을 저장할 수 있게 됩니다.
+이 중 가장 먼저 데이터 쓰기를 받는 저장소를 마스터(Master), 나머지 두 노드를 슬레이브(Slave)라 부릅니다.
+그렇다면 파일을 어느 청크셋에 저장할지는 누가 결정할까요? 바로 네임노드입니다.</p>
+
+<p>네임노드는 실제 파일이 저장되어있는 데이터노드, 청크 그리고 청크셋들의 정보를 관리하는 역할을 합니다.
+클라이언트는 데이터를 쓰기 위해서 먼저 네임노드에게 쓰기 가능한 청크셋의 정보를 요청합니다.
+이후 전달받은 정보를 통해 해당 청크셋의 마스터 데이터노드에 쓰기를 요청하게 되고,
+마스터는 먼저 자신의 하드디스크에 쓰기를 완료한 후에, 나머지 슬레이브 노드에 데이터를 전달합니다.
+모든 쓰기 과정이 성공적으로 완료되면 Kage-Key를 받게 되는데, Kage-Key에는 청크셋ID와 오프셋 등 파일을 찾을 수 있는 정보가 담겨있습니다.
+클라이언트는 이후에 이 Key를 이용해 데이터노드에 읽기 혹은 삭제 요청을 진행할 수 있습니다.</p>
+
+<h2 id="kage-key">Kage-Key</h2>
+
+<p>읽다 보니 일반적인 파일 쓰기와 조금 다른 점을 느끼신 분들도 있을 텐데요, 일반적인 쓰기의 경우 파일 이름, 내용, 그리고 저장 위치로 쓰기를 요청하는 반면,
+Kage의 경우 파일 이름과 내용만으로 쓰기를 요청하고 파일이 저장된 위치(KAGE_KEY)를 돌려받습니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>일반적인 쓰기:
+    Write('/tech/articles/', 'q.txt', '아이유님은 언제쯤 판교에 방문해주시나요?');
+    -&gt; Response(RESULT_CODE)
+Kage의 쓰기:
+    Write('q.txt', '아이유님은 언제쯤 판교에 방문해주시나요?');
+    -&gt; Response(RESULT_CODE, KAGE_KEY)
+</code></pre></div></div>
+
+<p>전통적인 파일 시스템을 이용하는 NAS에서 파일을 읽게 되면 하나의 파일 읽기 요청에 대해서도 여러 번의 IO 오퍼레이션이 발생하게 됩니다.
+파일 이름을 inode번호로 변환하고, inode를 디스크에서 읽고, 실제 파일내용을 디스크로 읽는 등의 과정을 거쳐야 합니다.
+파일 시스템은 파일마다 메타정보(이름, 디렉토리 등)를 가지고 있고, 파일 개수가 많아질 수록 이러한 메타정보가 큰 병목이 됩니다.<sup id="fnref:2:1"><a href="#fn:2" class="footnote">2</a></sup>
+Kage는 커다란 파일(Chunk)에 순차적으로 데이터를 쓰고, Kage-Key를 통해 데이터의 논리적 위치를 구해내어 바로 접근하게 함으로써 이러한 병목 문제를 해결하였습니다.</p>
+
+<p>발급받은 Kage-Key는 모두 서비스쪽에서 관리를 하여야 하는데, 혹시나 서비스쪽에서 Key를 분실한다면 영영 데이터를 찾을 수 없는 문제도 있습니다. 하지만 동시에 해당 서비스 담당자 외에는 (Kage 개발자 조차) 특정 파일이 어디에 저장되어있는지 전혀 유추할 수 없다는 보안적 장점도 가지고 있습니다.</p>
+
+<h2 id="expire-기능">Expire 기능</h2>
+
+<p>Kage의 또 다른 재미있는 특징은 일정 시간이 지나면 파일이 자동으로 삭제되도록 설정할 수 있다는 것입니다.
+카카오톡의 이미지, 비디오 전송을 위해서 개발이 시작되었기 때문에 일정 시간이 지나면 청크를 삭제하며 디스크를 끝없이 재활용할 수 있게 설계되었습니다.</p>
+
+<p>이 특성 때문에 청크들이 시간에 따라 삭제되고 다시 생성되는 과정이 끊임없이 반복되는데,
+이 과정에서 갑자기 청크가 부족하거나, 특정 데이터노드에 트래픽이 몰리거나, 한꺼번에 많은 청크가 삭제되는 등의 현상이 발생하곤 했습니다.</p>
+
+<p>자칫하면 큰 장애로 이어질 수 있는 이러한 문제들을 해결하기 위해,
+청크를 할당하는 스케쥴링 방법을 다양하게 세워 최대한 노드에 트래픽이 골고루 분산될 수 있도록 하였습니다.
+현재 주로 사용하고 있는 스케쥴링 방법은 아래와 같습니다.</p>
+
+<ul>
+  <li>청크의 평균 사용량이 N% 이상일 때</li>
+  <li>쓰기 가능한 청크가 N개 이하 일 때</li>
+  <li>가장 사용량이 적은 청크의 사용량이 N% 이상일 때</li>
+</ul>
+
+<p><img src="/files/kage-chunkstat.png" alt="트래픽이 몰릴 것으로 예상되는 이벤트 전엔 청크 분배 현황을 점검하기도 한다" /></p>
+
+<h2 id="idc-이중화-정책">IDC 이중화 정책</h2>
+
+<p>Kage는 안정적인 서비스를 위해서 모든 노드들을 빠짐없이 이중화 혹은 삼중화하여 운영하고 있습니다.
+또한 특정 IDC에서 문제가 생겼을 때에 발생하는 장애를 최소화하기 위해, IDC 이중화도 함께 진행하고 있습니다.</p>
+
+<p>청크셋을 구성하는 대부분의 청크들 역시 두 IDC에 포함하도록 구성하고 있는데 여기에 재미있는 정책이 있습니다.
+Kage의 데이터는 Master-&gt;Slave-&gt;Slave 순으로 쓰이게 되는데, Master와 두 Slave의 IDC를 다르게 선택하는 정책을 사용하고 있습니다.</p>
+
+<p>예를 들어 Master가 IDC-A에 있는 데이터노드라면, 나머지 두 Slave는 IDC-B에 있는 데이터노드에서 선택하는 것입니다.
+이는 특정 IDC의 장애나 IDC 간의 단절이 발생했을 때 쓰기 실패를 좀 더 빨리 감지하기 위해서입니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IDC-B에 장애가 발생했을 때 쓰기 시나리오
+(1) IDC-A(Master) -&gt; IDC-A(Slave) -/&gt; IDC-B(Slave)
+(2) IDC-A(Master) -/&gt; IDC-B(Slave) -&gt; IDC-B(Slave)
+        
+(1), (2) 모두 쓰기 실패이지만, (2)의 경우에 좀 더 빨리 실패를 감지할 수 있다.
+</code></pre></div></div>
+
+<p>하지만 모든 청크셋이 여러 IDC에 걸쳐 있다면 IDC 단절 시 쓰기가 무조건 실패하는 문제가 발생하게 됩니다.
+따라서 같은 IDC에 있는 데이터노드들로만 구성된 청크셋도 유지하여 하나의 IDC로도 서비스가 가능하게 운영하고 있습니다.</p>
+
+<p>네임노드 역시 인터링크를 거치지 않고 데이터를 전달하기 위해 각 IDC 별로 하나 이상 존재합니다.
+빠른 데이터 전달과 장애 극복을 위해 네임노드는 다음과 같은 우선순위를 이용해 쓰기 가능한 청크셋을 고릅니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. Multi IDC이고 Master가 네임노드와 같은 IDC에 있는 청크셋
+2. Multi IDC이고 Master가 네임노드와 다른 IDC에 있는 청크셋
+3. Single IDC이고 Master가 네임노드와 같은 IDC에 있는 청크셋
+4. Single IDC이고 Master가 네임노드와 다른 IDC에 있는 청크셋
+</code></pre></div></div>
+
+<h2 id="이미지-변환과-동영상-트랜스코딩-지원">이미지 변환과 동영상 트랜스코딩 지원</h2>
+
+<p>사내에 다양한 서비스들이 생기고 다양한 종류의 미디어 파일이 업로드됨에 따라, 이에 대한 전처리 혹은 후처리까지 지원하는 API서버의 필요성이 높아지게 되었습니다.
+특히 비디오 파일은 모든 기기에서 원활하게 재생 가능하기 위해 트랜스코딩을 하는 과정이 필요합니다.
+이 과정을 클라이언트에서 진행할 경우 너무 시간이 오래 걸려 사용자에게 좋지 않은 경험을 주게 때문에,
+Kage에 업로드되는 동영상의 경우 모두 서버단에서 트랜스코딩을 거쳐서 저장되고 사용자들에게 제공되게 됩니다.
+현재 컨테이너 기반의 Worker 서버들이 FFMPEG을 이용해 분산 트랜스코딩을 진행하고 있습니다.
+트랜스코딩의 대략적인 흐름은 아래와 같습니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 임시 저장소에 원본 동영상을 업로드
+2. Worker 서버들이 영상의 일부를 트랜스코딩한 후 조각 파일을 임시 저장소에 업로드
+3. 2의 과정이 모두 완료되면 임시저장소에 저장된 조각 파일들을 합친 후 실제 저장소에 업로드
+4. 1~3의 과정은 자체 개발한 Job-Queue와 FUSE API를 이용하여 진행
+</code></pre></div></div>
+
+<p><img src="/files/kage-workers.png" alt="Kage Transcoding Workflow" /></p>
+
+<p>이미지의 썸네일 생성이나 서비스마다 필요한 다양한 이미지 효과 처리를 위해서 업로드 혹은 다운로드 시에 이미지를 변환하는 기능도 제공하고 있습니다. 
+API 서버는 HTTP 프로토콜로 Kage로 업로드 및 다운로드가 가능하고 설정에 따라 한 번의 업로드로 다양한 종류의 이미지를 얻어 낼 수 있기 때문에,
+모든 서비스 개발자들은 이 API 서버를 통해 Kage를 이용하고 있습니다.</p>
+
+<p>새로운 SNS 서비스를 만들어서 프로필 사진을 업로드한다고 가정해봅시다. 혹시 모르니 원본도 저장하여야 하고, 빠른 이미지 서빙을 위해 JPEG이나 WEBP로 압축된 파일도 필요하고, 썸네일도 필요하고, 어쩌면 얼굴 부분만 자른 사진도 필요할 것입니다. 큰 작업이 아니라고 생각될 수도 있으나 매 서비스마다 비슷한 개발을 진행하여야 한다면, 전사 차원에선 큰 리소스 낭비가 아닐 수 없습니다. 따라서 서비스 개발 시에 필요한 이미지 관련 처리들은 Kage API 서버에서 전담하여 처리하고 있습니다.</p>
+
+<h2 id="object-storage-meta-kage">Object Storage: Meta-Kage</h2>
+<p>카카오의 클라우드 서비스(Krane)가 개발되면서 오브젝트 스토리지(Object Storage)에 대한 필요성이 생겼고, 이 때문에 파일의 메타정보까지 저장하는 Meta-Kage라는 시스템이 탄생하게 되었습니다. 오브젝트 스토리지는 실제 데이터와 메타 데이터를 분리하여 저장하며, 주로 사용자 계정마다 고유 식별자를 통해 파일에 접근하는 형태의 스토리지입니다. 기존의 블록 스토리지보다 성능은 떨어지지만 훨씬 많은 양의 데이터를 효율적으로 저장할 수 있다는 장점을 가지고 있습니다. 대표적인 오브젝트 스토리지 서비스로는 Amazon의 S3가 있습니다.</p>
+
+<p>Meta-Kage를 단순하게 풀어보자면 실제 파일을 저장하는 Kage와 파일의 메타 정보를 저장할 Key-Value Store를 조합한 형태로 볼 수 있습니다.
+만약 사용자가 “loen/image/iu.jpg”라는 파일을 Meta-Kage에 저장하기를 요청한다면 API 서버는 Kage에 파일을 써서 Kage-Key를 얻은 후에,
+Key-Value Store에 (“loen/image/iu.jpg”, Kage-Key)를 기록합니다. 이후에 읽기가 요청된다면 Key-Value Store에서 “loen/image/iu.jpg”에 해당하는 Kage-Key를 찾은 후에 Kage에서 해당 데이터를 읽어 요청자에게 전달하게 됩니다.</p>
+
+<p>Meta-Kage는 OpenStack의 Swift API를 지원하도록 개발되었으며 현재 사내의 오브젝트 스토리지, Docker Hub 등을 포함해 비교적 업로드가 적은 서비스에서 주로 이용하고 있습니다.</p>
+
+<h2 id="cold-storage-cave">Cold Storage: Cave</h2>
+<p>SNS에 업로드되는 이미지나 비디오는 시간이 흐를수록 접근 빈도가 크게 떨어지는 특징을 가지고 있습니다.
+업로드 한지 얼마 되지 않아 많은 인기를 끌고 있는 (= 많은 읽기 요청을 받는) Data를 Hot Data라고 부르고, 반면 시간이 많이 흘러 인기가 식어버린 데이터를 Cold Data라고 부릅니다.</p>
+
+<p><img src="/files/kage-ice.jpg" alt="Cold Data...?! (출처:http://www.pcmag.com)" /></p>
+
+<p>Hot Data는 많은 읽기 요청 트래픽 및 장애에 버티기 위해 보통 2벌 정도 더 복제해서 저장하는데, 모든 데이터를 원본 크기에 3배가 되는 용량으로 유지하는 것은 기업 입장에서 큰 비용입니다.
+카카오톡에서 업로드된 데이터들은 일정 시간이 지나면 지워지기 때문에 상관이 없지만, 카카오스토리와 같은 서비스에 업로드 된 데이터는 영구적으로 고객들에게 제공되어야 하니 부담이 아닐 수 없습니다.
+그렇다고 원본만 남기고 나머지를 지워버리기엔 하드디스크의 장애의 위험이 있기 때문에, ‘비교적 적은 용량으로 데이터를 신뢰성 있게 유지 보관하는’  Cold Storage의 필요성이 높아졌습니다.
+그래서 기존 Kage 시스템을 바탕으로 Replication Factor 1.5로 데이터를 저장하는 Cave(고대 문서는 꼭 동굴에서 나오니깐…)가 탄생하게 되었습니다.</p>
+
+<p>Cave 역시 기존 Kage 시스템을 바탕으로 개발되었습니다. 다만 기존 Kage에서 데이터를 저장할 땐 Replication Factor가 3이었는데 (2벌을 복제하여 총 3벌을 저장), Cave는 Replication가 1.5입니다.
+‘1.5라고 하면 원본을 제외하고 반쪽만 더 저장하는 거 아닌가?’라고 생각할 수 있겠지만 1/3 정도 맞는(?) 이야기입니다.
+Cave는 데이터를 6개의 블럭으로 나눈 후, Reed-Solomon Coding<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup>을 이용하여 3개의 블럭(Parity Block)을 더 만들어 냅니다. 그리고 만들어진 9개의 블럭을 9개의 Datanode에 나누어 저장합니다</p>
+
+<p>이렇게 만들어진 9개의 블럭 중에 6개의 블럭만 있으면 Reed-Solomon decoding을 이용해 원본 데이터를 만들어 낼 수 있기 때문에, (Replication Factor = 9/6 = 1.5)
+읽기 요청 시에 6개의 블럭만 읽어들여 원본 데이터를 만들어낸 후 유저들에게 제공하게 됩니다.
+3개의 디스크에 장애가 발생하는 경우에도 문제없이 데이터를 제공하는 게 가능하며, 에러가 발생한 블럭들을 복구해 낼 수 있습니다.</p>
+
+<p><img src="/files/kage-cave.png" alt="Cave Fail-over" /></p>
+
+<p>카카오스토리처럼 영구 저장되는 데이터는 시간이 지나면 Cave로 마이그레이션 된 후, 데이터에 접근할 수 있는 새로운 키(Cave-Key) 새로 발급받게 됩니다.
+하지만 서비스 개발자나 유저들은 기존의 Kage-key로도 Cave로 이동한 데이터를 읽을 수 있어야 하므로, 마이그레이션 시 (Kage-key, Cave-key) 쌍을 Key-value Store에 기록해둡니다.
+Cave가 구축된 이후부터 API 서버는 아래와 같은 방식으로 데이터를 읽고 있습니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 클라이언트에서 Kage-key로 API 서버에 읽기를 요청
+2. API 서버는 Kage-key로 Key-value Store에 GET을 요청(1ms 이내의 반응속도 보장)
+3. GET이 성공한다면) 리턴받은 Cave-key를 이용해 Cave에 읽기 요청
+   GET이 실패한다면) Kage-key를 이용해 Kage에 읽기 요청
+4. API 서버는 전달받은 데이터를 클라이언트에게 전달
+</code></pre></div></div>
+
+<h2 id="마치며">마치며…</h2>
+
+<p>지금까지 카카오의 여러 서비스들이 사용하고 있는 분산 스토리지 시스템의 발전 과정에 대해 알아보았습니다.
+처음에는 NAS를 대체하기 위해 만든 단순한 형태의 스토리지 시스템이었지만 다양한 니즈에 의해 멀티미디어 지원, 오브젝트 스토리지, 콜드 스토리지 등의 형태로 발전하게 되었습니다.
+전반적인 컨셉과 발전과정을 설명하는 것이 목적이었던 글이었기 때문에, 이론적 배경이나 설명이 다소 부족한 감이 있습니다. 나중에 기회가 된다면 한번 자세히 다뤄보도록 하겠습니다. ^^</p>
+
+<h2 id="references">References</h2>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p><a href="https://static.googleusercontent.com/media/research.google.com/ko//archive/gfs-sosp2003.pdf">The Google File System</a> <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p><a href="https://www.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf">Finding a needle in Haystack: Facebook’s photo storage</a> <a href="#fnref:2" class="reversefootnote">&#8617;</a> <a href="#fnref:2:1" class="reversefootnote">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:3">
+      <p><a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction">Reed-Solomon error correlation</a> <a href="#fnref:3" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+</div>
+  <div id="post-footer">
+    
+    <a id="post-author" href="/authors/justin.bv/">
+      <div id="author-image" style="background-image:url(/files/authors/justin.bv.jpg);">
+        <span class="sr-only">justin.bv's profile image</span>
+      </div>
+      <p id="author-name">justin.bv</p>
+    </a>
+    <p id="post-date">2017-01-12 14:00</p>
+    <a id="post-more" href="/authors/justin.bv/">
+      <span>Read more posts by this author</span>
+    </a>
+  </div>
+</div>
+
+<div class="container" style="margin-top:25px; padding:0px">
+  <a href="https://www.welcomekakao.com" target="_blank"><img src="/files/career2020.jpg" style="width:100%;"></a>
+</div>
+
+<div id="post-links" class="container">
+  
+  
+  <div id="post-prev" >
+    <div>
+      <h3><a href="/2017/01/09/daummovie-rxjs/">RxJS - Daum영화에 적용하다</a></h3>
+      <p>YOU MIGHT ENJOY</p>
+    </div>
+  </div>
+  
+  
+  
+  <div id="post-next" >
+    <div>
+      <h3><a href="/2017/01/25/nomad/">오픈소스 간단 리뷰 - nomad : 가벼운 스케쥴러, 강력한 성능</a></h3>
+      <p>NEXT POST</p>
+    </div>
+  </div>
+  
+</div>
+
+<div id="lightbox">
+  <div id="lightbox-image"></div>
+</div>
+
+    <div class="clearfix"></div>
+
+    <a href="#" id="back-to-top"></a>
+</div>
+
+<div id="footer" class="container-fluid">
+    <ul id="links">
+        
+        <li>
+            <a id="link-github" href="http://github.com/kakao" target="_blank">
+                <span class="sr-only">github</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-facebook" href="http://facebook.com/nkakao" target="_blank">
+                <span class="sr-only">facebook</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-twitter" href="http://twitter.com/kakaodev" target="_blank">
+                <span class="sr-only">twitter</span>
+            </a>
+        </li>
+        
+        <li>
+            <a id="link-rss" href="/rss" target="_blank">
+                <span class="sr-only">rss</span>
+            </a>
+        </li>
+    </ul>
+    <ul id="footer-menu">
+        <li><a href="//www.kakaocorp.com">Kakao</a></li>
+        <li><a href="//careers.kakao.com/jobs">Jobs</a></li>
+        <li><a href="//privacy.kakaocorp.com">Privacy</a></li>
+    </ul>
+    <p id="copyright">
+        <a href="//www.kakaocorp.com">Copyright &copy; Kakao Corp.</a>
+        All rights reserved.
+    </p>
+</div><!--#footer-->
+
+
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-72007721-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+
+    <script type='text/javascript'>
+   //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    //Kakao.init('65d48e116d8b9409e08960c4800c3017');
+    function shareStory(abs_page_url) {
+        Kakao.Story.share({
+            url: abs_page_url,
+            text: '카카오 기술블로그 #개발자 #카카오'
+        });
+    }
+    //]]>
+</script>
+
+    
+    <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1204347326263800',
+    xfbml      : true,
+    version    : 'v2.7'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+    
+
+    
+    <script>!function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    }(document, 'script', 'twitter-wjs');
+</script>
+
+    
+
+    
+    <script src="https://apis.google.com/js/platform.js" async defer>
+    {
+        lang: 'ko'
+    }
+</script>
+
+    
+
+</body>
+</html>

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+
+
+<title>Asynchronous Programming and Monad Transformers in Scala</title>
+<meta name="title" content="Asynchronous Programming and Monad Transformers in Scala" />
+<meta name="author" content="liam.m"/>
+<meta name="description" content="자바와 스프링으로 웹서버를 개발하고 있다면 아래와 같이 HTTP 프로그래밍을 했을것이라 생각이 됩니다. // ItemApiController.java import ... @RestController @RequestMapping("/api/items") public class ItemApiController { @Autowired RestTemplate restTemplate; @RequestMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE) public ItemDto getItem(@PathVariable Long id) { // 응답이 올때 까지 thread는 대기하게 된다. return restTemplate.getForObject("http://remote/fetch/item/" + id, ItemDto.class); } } 익숙한 이상할것이 없는 동기화 프로그래밍 코드입니다. 동기화 방식은 아래와 같은 장점을 가지고 있습니다. 프로그래밍하기 간편하고 순차적으로 실행되기 때문에 상대적으로 개발하기 쉽습니다. Multi thread 환경을..."/>
+
+<meta property="fb:app_id" content="1204347326263800"/>
+
+<meta property="og:site_name" content="kakao 기술 블로그"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="Asynchronous Programming and Monad Transformers in Scala"/>
+<meta property="og:description" content="자바와 스프링으로 웹서버를 개발하고 있다면 아래와 같이 HTTP 프로그래밍을 했을것이라 생각이 됩니다. // ItemApiController.java import ... @RestController @RequestMapping("/api/items") public class ItemApiController { @Autowired RestTemplate restTemplate; @RequestMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE) public ItemDto getItem(@PathVariable Long id) { // 응답이 올때 까지 thread는 대기하게 된다. return restTemplate.getForObject("http://remote/fetch/item/" + id, ItemDto.class); } } 익숙한 이상할것이 없는 동기화 프로그래밍 코드입니다. 동기화 방식은 아래와 같은 장점을 가지고 있습니다. 프로그래밍하기 간편하고 순차적으로 실행되기 때문에 상대적으로 개발하기 쉽습니다. Multi thread 환경을..."/>
+<meta property="og:url" content="http://localhost:4000/2016/05/04/asynchronous-programming-and-monad-transformers-in-scala/"/>
+<meta property="og:image" content="http://localhost:4000/files/covers/monad.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Asynchronous Programming and Monad Transformers in Scala"/>
+<meta name="twitter:description" content="자바와 스프링으로 웹서버를 개발하고 있다면 아래와 같이 HTTP 프로그래밍을 했을것이라 생각이 됩니다. // ItemApiController.java import ... @RestController @RequestMapping("/api/items") public class ItemApiController { @Autowired RestTemplate restTemplate; @RequestMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE) public ItemDto getItem(@PathVariable Long id) { // 응답이 올때 까지 thread는 대기하게 된다. return restTemplate.getForObject("http://remote/fetch/item/" + id, ItemDto.class); } } 익숙한 이상할것이 없는 동기화 프로그래밍 코드입니다. 동기화 방식은 아래와 같은 장점을 가지고 있습니다. 프로그래밍하기 간편하고 순차적으로 실행되기 때문에 상대적으로 개발하기 쉽습니다. Multi thread 환경을..."/>
+<meta name="twitter:label1" content="Written by"/>
+<meta name="twitter:data1" content="liam.m"/>
+<meta name="twitter:image:src" content="http://localhost:4000/files/covers/monad.jpg"/>
+
+<meta name="twitter:label2" content="Filed under"/>
+<meta name="twitter:data2" content="monad,monad-transformer,scala,scalaz,functional-programming"/>
+
+<meta property="article:tag" content="monad"/>
+
+<meta property="article:tag" content="monad-transformer"/>
+
+<meta property="article:tag" content="scala"/>
+
+<meta property="article:tag" content="scalaz"/>
+
+<meta property="article:tag" content="functional-programming"/>
+
+
+
+<meta property="article:published_time" content="2016-05-04T12:57:00+09:00"/>
+
+
+<meta property="article:author" content="http://localhost:4000/authors/liam.m"/>
+
+<link href="http://localhost:4000/rss/" rel="alternate" type="application/rss+xml" title="RSS"/>
+<link href="/assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" type="image/png"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon-precomposed" type="image/png"/>
+<link href="/assets/lib/normalize.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/css/monokai.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/lib/magnific-popup.min.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/fonts/Kakao.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/css/screen.css" rel="stylesheet" type="text/css"/>
+<script>
+    if (window.location.host.indexOf('tech.kakao.com') > -1 && window.location.protocol == "https:"){
+        window.location = window.location.toString().replace(/^https:/, "http:");
+    }
+</script>
+
+</head>
+<body class="post-template">
+
+<div id="header">
+    <button id="menu-toggle" type="button">
+        <span class="sr-only">Toggle Navigation Menu</span>
+    </button>
+    <button id="search-toggle" type="button">
+        <span class="sr-only">Toggle Search Form</span>
+    </button>
+    <a id="logo" href="/">
+        <span class="sr-only">KakaoTech</span>
+    </a>
+    <div id="search">
+        <input id="search-input" type="search" placeholder="Search..." value="" />
+    </div>
+    <ul class="search__results" id="results-container"></ul>
+
+    <ul id="menu" class="nav">
+        <li class=" active "><a href="/">블로그</a></li>
+        <li class=""><a href="/opensource/">오픈소스</a></li>
+        <li class=""><a href="/openapi/">오픈API</a></li>
+        <li class=""><a href="/events/">기술행사</a></li>
+    </ul>
+</div>
+<!-- Script pointing to jekyll-search.js -->
+<script src="/dest/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '/search2.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: '<li>No results found</li>',
+        limit: 15,
+        fuzzy: false,
+        exclude: ['Welcome']
+    })
+</script><!-- #header -->
+
+
+
+<div id="wrapper">
+    <div id="navbar" class="container">
+  <h5><a id="link-back" href="/">Back to Posts</a></h5>
+  
+<ul id="shares">
+    <li class="stalk" style="display:none">
+        <a id="kakao-link-btn" href="javascript:;"></a>
+    </li>
+    <li>
+        <a id="share-kakaostory" href="javascript:shareStory('http://localhost:4000/2016/05/04/asynchronous-programming-and-monad-transformers-in-scala/');"></a>
+    </li>
+
+    
+    <li>
+        <a id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/2016/05/04/asynchronous-programming-and-monad-transformers-in-scala/"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="sr-only">Share to Facebook</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-twitter"
+           href="https://twitter.com/intent/tweet?text=Asynchronous%20Programming%20and%20Monad%20Transformers%20in%20Scala&url=http://localhost:4000/2016/05/04/asynchronous-programming-and-monad-transformers-in-scala/">
+            <span class="sr-only">Share to Twitter</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-google" href="https://plus.google.com/share?url=http://localhost:4000/2016/05/04/asynchronous-programming-and-monad-transformers-in-scala/"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+            <span class="sr-only">Share to Google+</span>
+        </a>
+    </li>
+    
+</ul>
+
+</div>
+
+<div id="cover" class="container" style="background-image: url(/files/covers/monad.jpg);" >
+  <div>
+    <h1>Asynchronous Programming and Monad Transformers in Scala</h1>
+    <p>
+      
+      <a href="/tags/monad">monad</a>
+      ,
+      
+      <a href="/tags/monad-transformer">monad-transformer</a>
+      ,
+      
+      <a href="/tags/scala">scala</a>
+      ,
+      
+      <a href="/tags/scalaz">scalaz</a>
+      ,
+      
+      <a href="/tags/functional-programming">functional-programming</a>
+      
+      
+    </p>
+    
+
+
+  </div>
+</div>
+
+<div id="content" class="container post" role="main">
+  <div id="post-content"><p>자바와 스프링으로 웹서버를 개발하고 있다면 아래와 같이 HTTP 프로그래밍을 했을것이라 생각이 됩니다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ItemApiController.java</span>
+<span class="kn">import</span> <span class="nn">...</span>
+
+<span class="nd">@RestController</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/api/items"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ItemApiController</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">;</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"/{id}"</span><span class="o">,</span> <span class="n">produces</span> <span class="o">=</span> <span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON_VALUE</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">ItemDto</span> <span class="nf">getItem</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="n">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 응답이 올때 까지 thread는 대기하게 된다.</span>
+        <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="s">"http://remote/fetch/item/"</span> <span class="o">+</span> <span class="n">id</span><span class="o">,</span> <span class="n">ItemDto</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>익숙한 이상할것이 없는 동기화 프로그래밍 코드입니다.</p>
+
+<p>동기화 방식은 아래와 같은 장점을 가지고 있습니다.</p>
+
+<ul>
+  <li>프로그래밍하기 간편하고 순차적으로 실행되기 때문에 상대적으로 개발하기 쉽습니다.</li>
+  <li>Multi thread 환경을 고려하지 않아도 되기 때문에 디버깅하기 편합니다.</li>
+  <li>Request가 thread를 독점하기 때문에 필요한 상태를 thread에 저장할수 있습니다.(stateful)</li>
+</ul>
+
+<p>하지만 동기화 방식으로 개발하고 운영하다 보면 <strong>thead pool hell</strong>이라 불리는 아래와 같은 현상을 자주 마주하게 됩니다.
+<img src="http://image.slidesharecdn.com/theplayframeworkatlinkedin-final-130604033451-phpapp01/95/the-play-framework-at-linkedin-8-638.jpg" alt="Thread pool hell" /></p>
+<ul>
+  <li>
+    <p>이미지 출처: <a href="http://www.slideshare.net/brikis98/the-play-framework-at-linkedin">
+The play framework at Linkedin</a></p>
+  </li>
+  <li>특정 API가 응답이 느릴경우 Request를 처리하는 thread는 blocking되고 응답이 오거나 timeout이 발생할때 까지는 thread는 waiting상태에서 머무르게 됩니다.</li>
+  <li>많은 수의 thread가 blocking되면 신규로 유입되는 request는 thread를 할당받지 못하고 요청을 처리를 못하게 됩니다.</li>
+  <li>Thread pool의 thread 다 사용하면 request를 제대로 처리하지 못하고 <a href="http://www.slideshare.net/brikis98/the-play-framework-at-linkedin">응답속도가 현저하게 느려지는 현상을 볼수 있습니다</a>.</li>
+</ul>
+
+<p>비동기 프로그래밍을 구현하면 아래와 같이 IO로 인해서 blocking되는 구간이 사라지게 되기 때문에 서버의 리소스(CPU, Memory, Network, Disk)를 충분히 활용할수 있습니다.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*XZlkILfsMj8nOnnXj5bnqw.png" alt="Synchronous (left) vs asynchronous (right) request processing" /></p>
+<ul>
+  <li>이미지 출처: <a href="https://medium.com/@paulcolomiets/the-future-of-asynchronous-io-in-python-ce200536d847">The Future of Asynchronous IO in Python</a></li>
+</ul>
+
+<p>Spring 3.2버전 부터 <a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/mvc.html#mvc-ann-async">비동기 프로그래밍</a>을 지원하고 있고 <a href="http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/AsyncRestTemplate.html"><code class="highlighter-rouge">AsyncRestTemplate.java</code></a> API을 통해서 비동기 HTTP 프로그래밍을 지원하고 있지만 실제 개발 환경에서 여러개의 <code class="highlighter-rouge">Future</code>를 효율적으로 조합(<code class="highlighter-rouge">flatMap</code>, <a href="http://loicdescotte.github.io/posts/scala-compose-option-future/">Monad Transformers</a>) 할수 없다면 이를 효과적으로 사용할수 없습니다. 이로 인해 부분적으로만 비동기 프로그래밍으로 구현한다면 블록킹 IO로 인해 스레드 waiting현상, <code class="highlighter-rouge">thread pool hell</code>은 피할수 없게 됩니다.</p>
+
+<p>지난번 포스팅에서 이야기 했던 <a href="http://tech.kakao.com/2016/03/03/monad-programming-with-scala-future/"><code class="highlighter-rouge">Monad Programming with Scala Future</code></a>에 이어를 <code class="highlighter-rouge">Future</code>를 Monad Transformers와 함께 사용하며 실전 web server programing에서 활용하고 이를 통해서 thread pool hell을 막을수 있는 방법에 대해서 알아보도록 하겠습니다.</p>
+
+<p>이를 위해서 Fully async programming을 지원해주는 <strong><a href="https://twitter.github.io/finatra/">Finatra</a> - Fast, testable, Scala services built on <a href="http://twitter.github.io/twitter-server/">Twitter-Server</a> and <a href="http://twitter.github.io/finagle/">Finagle</a></strong>를 이용해서 NIO programming을 해보겠습니다.</p>
+
+<h2 id="finatra">Finatra</h2>
+<p><a href="https://twitter.github.io/finatra/">Finatra</a>는 <a href="https://engineering.twitter.com/opensource/projects/finatra">트위터에서 만드는 오픈소스 프로젝트</a>로 Facebook의 <a href="https://facebook.github.io/react/">React</a>처럼 Twitter에서 <a href="https://twitter.github.io/finatra/assets/FinatraSFScala.pdf">Production</a>환경에서 사용하고 있는 open source web framework입니다.
+Finatra 이름의 기원은 Twitter의 <a href="http://twitter.github.io/finagle/">Finagle</a>과 Ruby의 <a href="http://www.sinatrarb.com/">Sinatra</a>를 합친 합성어입니다.</p>
+<blockquote>
+  <p><strong>Finatra</strong> = <strong>Fi</strong>nagle + Si<strong>natra</strong></p>
+</blockquote>
+
+<p>Finatra는 Sinatra의 간결한 Routing DSL을 채용하였으며 finagle의 다양한 RPC 기능을 활용한 통신과 Twitter Server의 플래그 관리와 어드민 기능을 통합하여 직관적이며 빠르게 개발할수 있는 생산성 높은 web framework입니다.</p>
+
+<p>우선 Finatra로 개발하기 위해서는 두가지 핵심 코어 <a href="http://twitter.github.io/finagle/">Finagle</a>과 <a href="http://twitter.github.io/twitter-server/">Twitter-Server</a>에 대해서 잠깐 알아보겠습니다.</p>
+
+<h3 id="finagle-알아보기">Finagle 알아보기</h3>
+<p>Finagle은 <a href="https://twitter.github.io/scala_school/ko/finagle.html">트위터의 RPC 시스템</a>으로 <a href="http://twitter.github.io/finagle/guide/Protocols.html">공식 문서에 나와 있는 프로토콜</a>은 <a href="http://twitter.github.io/finagle/guide/Protocols.html#thrift">Thrift</a>, <a href="http://twitter.github.io/finagle/guide/Protocols.html#mux">Mux</a>, <a href="http://twitter.github.io/finagle/guide/Protocols.html#mysql">Mysql</a>가 있고 <a href="https://github.com/twitter/finagle">Github 프로젝트</a>를 보면 <a href="https://github.com/twitter/finagle/tree/develop/finagle-memcached">fingle-memcached</a>, <a href="https://github.com/twitter/finagle/tree/develop/finagle-redis">finagle-redis</a>, <a href="https://github.com/twitter/finagle/tree/develop/finagle-http">finagle-http</a>, <a href="https://github.com/twitter/finagle/tree/develop/finagle-http2">finagle-http2</a> 등등 보다 다양한 프로토콜이 있습니다. Finagle을 활용하면 이들 프로토콜을 손쉽게 사용할수 있습니다.
+아래 그림을 보면 finagle server와 finagle client들을 이용하여 이종의 client들을 연결하는 서비스를 제공하고 있는것을 확인할수 있습니다.
+<img src="https://g.twimg.com/imported-images/60ae8ab0e5.png" alt="" /></p>
+<ul>
+  <li>이미지 출처: <a href="https://blog.twitter.com/2011/finagle-a-protocol-agnostic-rpc-system">
+트위터 공식 블로그 - A Finagle-based architecture</a></li>
+</ul>
+
+<p>이제 finagle의 RPC Client를 코드를 내부를 좀 더 파해쳐 보겠습니다.
+내부코드를 보면 finagle RPC의 구현의 기본은 <a href="https://github.com/twitter/finagle/blob/develop/finagle-core/src/main/scala/com/twitter/finagle/Client.scala#L33"><code class="highlighter-rouge">com.twitter.finagle.Client[Req, Rep]</code></a> trait을 mixin하는걸로 되어 있습니다.</p>
+
+<h4 id="finagle-memcached-client">Finagle Memcached Client</h4>
+<p>아래 소스 코드는 하위프로젝트 <a href="https://github.com/twitter/finagle/tree/develop/finagle-memcached">finagle-memcached</a>의 <a href="https://github.com/twitter/finagle/blob/develop/finagle-memcached/src/main/scala/com/twitter/finagle/Memcached.scala#L89-L108">com.twitter.finagle.Memcached.scala</a>의 일부분입니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// https://github.com/twitter/finagle/blob/develop/finagle-memcached/src/main/scala/com/twitter/finagle/Memcached.scala#L89
+// finagle.Client trait을 mixin 해서 interface를 구현하고 있습니다.
+</span><span class="k">trait</span> <span class="nc">MemcachedRichClient</span> <span class="o">{</span> <span class="n">self</span><span class="k">:</span> <span class="kt">finagle.Client</span><span class="o">[</span><span class="kt">Command</span>, <span class="kt">Response</span><span class="o">]</span> <span class="k">=&gt;</span>
+
+  <span class="k">def</span> <span class="n">newRichClient</span><span class="o">(</span><span class="n">dest</span><span class="k">:</span> <span class="kt">Name</span><span class="o">,</span> <span class="n">label</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">memcached.Client</span> <span class="o">=</span>
+    <span class="n">newTwemcacheClient</span><span class="o">(</span><span class="n">dest</span><span class="o">,</span> <span class="n">label</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="n">newRichClient</span><span class="o">(</span><span class="n">dest</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">memcached.Client</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">evalLabeled</span><span class="o">(</span><span class="n">dest</span><span class="o">)</span>
+    <span class="n">newTwemcacheClient</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="k">def</span> <span class="n">newTwemcacheClient</span><span class="o">(</span><span class="n">dest</span><span class="k">:</span> <span class="kt">Name</span><span class="o">,</span> <span class="n">label</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">TwemcacheClient</span>
+
+  <span class="k">def</span> <span class="n">newTwemcacheClient</span><span class="o">(</span><span class="n">dest</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">TwemcacheClient</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">evalLabeled</span><span class="o">(</span><span class="n">dest</span><span class="o">)</span>
+    <span class="n">newTwemcacheClient</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Finagle은 이종 프로토콜간의 동일한 interface를 제공해주기 위해서 fingle.Client의 mixin을 강제하고 있습니다.
+MemcachedRichClient에서는 <code class="highlighter-rouge">self: finagle.Client[Command, Response] =&gt;</code> 표현을 사용하고 mixin하고 있습니다.</p>
+
+<blockquote>
+  <p>Self type annotation에 대해서는 akka 창시자인 <a href="http://jonasboner.com/">Jonas Bonér</a>의 <a href="http://jonasboner.com/real-world-scala-dependency-injection-di/">real-world scala: dependency injection (di)</a>와 stackoverflow의 <a href="http://stackoverflow.com/questions/1990948/what-is-the-difference-between-self-types-and-trait-subclasses">What is the difference between self-types and trait subclasses?</a>를 참조하면 좋은 자료가 될것이라 생각합니다.</p>
+</blockquote>
+
+<h4 id="finagle-mysql-client">Finagle Mysql Client</h4>
+<p>이번엔 <a href="https://github.com/twitter/finagle/tree/develop/finagle-mysql">finagle-mysql</a>의 <a href="https://github.com/twitter/finagle/blob/develop/finagle-mysql/src/main/scala/com/twitter/finagle/Mysql.scala#L18-L33">com.twitter.finagle.Mysql.scala</a>의 구현의 일부를 보겠습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// https://github.com/twitter/finagle/blob/develop/finagle-mysql/src/main/scala/com/twitter/finagle/Mysql.scala#L18
+// 위와 동일하게 finagle.Client trait를 mixin하고 이를 통해서 interface를 구현하고 있습니다.
+</span><span class="k">trait</span> <span class="nc">MysqlRichClient</span> <span class="o">{</span> <span class="n">self</span><span class="k">:</span> <span class="kt">com.twitter.finagle.Client</span><span class="o">[</span><span class="kt">Request</span>, <span class="kt">Result</span><span class="o">]</span> <span class="k">=&gt;</span>
+
+  <span class="k">def</span> <span class="n">newRichClient</span><span class="o">(</span><span class="n">dest</span><span class="k">:</span> <span class="kt">Name</span><span class="o">,</span> <span class="n">label</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">mysql.Client</span> <span class="kt">with</span> <span class="kt">mysql.Transactions</span> <span class="o">=</span>
+    <span class="n">mysql</span><span class="o">.</span><span class="nc">Client</span><span class="o">(</span><span class="n">newClient</span><span class="o">(</span><span class="n">dest</span><span class="o">,</span> <span class="n">label</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="n">newRichClient</span><span class="o">(</span><span class="n">dest</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">mysql.Client</span> <span class="kt">with</span> <span class="kt">mysql.Transactions</span> <span class="o">=</span>
+    <span class="n">mysql</span><span class="o">.</span><span class="nc">Client</span><span class="o">(</span><span class="n">newClient</span><span class="o">(</span><span class="n">dest</span><span class="o">))</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>MemcachedRichClient와 유사게 인터페이스가 설계되어 있으며 내부 구현은 <code class="highlighter-rouge">mysql.Client</code>로 숨겨져 있는것을 확인할수 있습니다.</p>
+
+<p>Finagle의 모든 하위 RPC 프로젝트는 <code class="highlighter-rouge">fingle.Client</code>를 구현하고 있어서 다양한 RPC 프로토콜이 모두 같은 interface를 가지는 장점이 있습니다.</p>
+
+<h3 id="finatra에서의-finagle의-역할">Finatra에서의 finagle의 역할</h3>
+<p>Finatra는 finagle의 하위 프로젝트 <a href="https://github.com/twitter/finagle/tree/develop/finagle-http">finagle-http</a>의 <a href="https://github.com/twitter/finagle/blob/develop/finagle-http/src/main/scala/com/twitter/finagle/Http.scala#L298">HTTP 서버</a>를 사용하여 web framework이 설계되어 있습니다. 그리고 <a href="https://github.com/twitter/finagle/blob/develop/finagle-http/src/main/scala/com/twitter/finagle/http/netty/Netty3StreamTransport.scala#L17">finagle-http은 netty</a>를 기반으로 구현 되어있어서 최종적으로 <code class="highlighter-rouge">finatra &lt; finagle &lt; netty</code> 순으로 의존도가 있다고 생각하시면 됩니다.</p>
+
+<p>Finatra의 <a href="https://github.com/twitter/finatra/blob/develop/http/src/main/scala/com/twitter/finatra/http/internal/server/BaseHttpServer.scala">BaseHttpServer.scala</a> 소스 코드를 보면 finagle의 <a href="https://github.com/twitter/finagle/blob/develop/finagle-http/src/main/scala/com/twitter/finagle/Http.scala#L298">com.twitter.finagle.Http.Server</a>를 이용하여 http server를 구성하고 있는것을 확인할수 있습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// https://github.com/twitter/finatra/blob/develop/http/src/main/scala/com/twitter/finatra/http/internal/server/BaseHttpServer.scala
+</span>
+<span class="c1">// Finatra BaseHttpserver 코드의 일부
+</span><span class="k">package</span> <span class="nn">com.twitter.finatra.http.internal.server</span>
+
+<span class="c1">// finagle.Http를 import하고 있습니다.
+</span><span class="k">import</span> <span class="nn">com.twitter.finagle.</span><span class="o">{</span><span class="nc">ListeningServer</span><span class="o">,</span> <span class="nc">Http</span><span class="o">,</span> <span class="nc">Service</span><span class="o">}</span>
+
+<span class="k">trait</span> <span class="nc">BaseHttpServer</span> <span class="k">extends</span> <span class="nc">TwitterServer</span> <span class="o">{</span>
+<span class="o">...</span>
+  <span class="c1">// import한 finagle.Http.server를 이용해서 Http서버를 만들고 있습니다.
+</span>  <span class="k">private</span> <span class="k">lazy</span> <span class="k">val</span> <span class="n">baseHttpServer</span><span class="k">:</span> <span class="kt">Http.Server</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nc">Http</span><span class="o">.</span><span class="n">server</span>
+      <span class="o">.</span><span class="n">withMaxRequestSize</span><span class="o">(</span><span class="n">maxRequestSizeFlag</span><span class="o">())</span>
+      <span class="o">.</span><span class="n">withStreaming</span><span class="o">(</span><span class="n">streamRequest</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="twitter-server-대해-알아보기"><a href="http://twitter.github.io/twitter-server/">Twitter Server</a> 대해 알아보기</h3>
+<p>Finatra를 <a href="http://twitter.github.io/twitter-server/">Twitter Server</a>를 이용하여 엔터프라이즈급 서버에 필요한 다양한 모니터링 솔루션(<a href="https://twitter.github.io/twitter-server/Admin.html">어드민</a>, <a href="https://twitter.github.io/twitter-server/Admin.html#admin-tracing">트래킹</a>, <a href="https://twitter.github.io/twitter-server/Admin.html#metrics">통계</a>)과 <a href="https://twitter.github.io/twitter-server/Features.html#flags">설정 플래그</a>와 같은 부분은 공통 컴포넌트화 해서 제공하고 있습니다.</p>
+
+<p>아래 그림은 <a href="https://twitter.github.io/twitter-server/Admin.html">Twitter Server 어드민 페이지</a>에서 볼수 있는 서버 모니터링 화면입니다.</p>
+
+<p><img src="https://twitter.github.io/twitter-server/_images/intro.png" alt="트위터 서버의 어드민 페이지" />
+<img src="https://twitter.github.io/twitter-server/_images/metric_watch.png" alt="트위터 서버의 통계 페이지의 일부" /></p>
+
+<h2 id="finatra로-fully-async-http-서버-개발-시작하기">Finatra로 Fully Async HTTP 서버 개발 시작하기</h2>
+
+<h3 id="step-0---lightbend-activator-설치-및-실행">Step 0 - <a href="https://www.lightbend.com/activator/download">Lightbend Activator</a> 설치 및 실행</h3>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># activator 다운로드</span>
+curl https://downloads.typesafe.com/typesafe-activator/1.3.10/typesafe-activator-1.3.10.zip <span class="se">\</span>
+<span class="nt">-o</span> typesafe-activator-1.3.10.zip
+<span class="c"># 압축 해제</span>
+unzip typesafe-activator-1.3.10.zip
+<span class="c"># activator 실행</span>
+activator-dist-1.3.10/bin/activator ui
+</code></pre></div></div>
+
+<p>위의 순서로 실행하면 아래와 같은 화면이 브라우저에 뜹니다.
+<img src="/files/monad-activator-ui.png" alt="activator ui 실행 화면" /></p>
+
+<h3 id="step-1---finatra-프로젝트-생성">Step 1 - Finatra 프로젝트 생성</h3>
+<p><a href="https://github.com/ikhoon/finatra-mysql-seed">finatra-mysql-seed</a> 프로젝트를 이용하여 finatra를 개발하는 과정에 대하여 설명하겠습니다.
+finatra-mysql-seed project는 finatra를 이용해서 개발하면서  재사용되는 부분을 template화 해서 만들어 놓은 project입니다.</p>
+
+<p>설치 방법은 아래 3가지 방법중 1가지를 선택하여 설치하시면 됩니다.</p>
+
+<ul>
+  <li>선택 1(권장) - activator의 ui에서 <code class="highlighter-rouge">finatra-mysql-seed</code>검색해서 seed 프로젝트를 설치할 수 있습니다.</li>
+</ul>
+
+<p><img src="/files/monad-activator-ui-create-app.png" alt="activator ui를 이용한 finatra-mysql-seed 프로젝트 설치" /></p>
+
+<ul>
+  <li>선택 2 - activator ui의 사용을 원하지 않을 경우 command line에서 아래 명령어를 실행하면 됩니다.</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./activator-dist-1.3.10/bin/activator new finatra-starter finatra-mysql-seed
+
+Fetching the latest list of templates...
+
+OK, application <span class="s2">"finatra-starter"</span> is being created using the <span class="s2">"finatra-mysql-seed"</span> template.
+
+To run <span class="s2">"finatra-starter"</span> from the <span class="nb">command </span>line, <span class="s2">"cd finatra-starter"</span> <span class="k">then</span>:
+/Users/.../finatra-starter/activator run
+
+To run the <span class="nb">test </span><span class="k">for</span> <span class="s2">"finatra-starter"</span> from the <span class="nb">command </span>line, <span class="s2">"cd finatra-starter"</span> <span class="k">then</span>:
+/Users/.../finatra-starter/activator <span class="nb">test
+
+</span>To run the Activator UI <span class="k">for</span> <span class="s2">"finatra-stater"</span> from the <span class="nb">command </span>line, <span class="s2">"cd finatra-starter"</span> <span class="k">then</span>:
+/Users/.../finatra-starter/activator ui
+</code></pre></div></div>
+
+<ul>
+  <li>선택 3 - activator를 사용을 원하지 않으면 <a href="http://www.scala-sbt.org/">sbt</a>를 사용하여 프로젝트를 활성화할수 있습니다.</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:ikhoon/finatra-mysql-seed.git finatra-starter
+</code></pre></div></div>
+
+<h3 id="step-2-프로젝트를-시작하기">Step 2. 프로젝트를 시작하기</h3>
+<p>우선 로컬에 <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">JDK8</a> 그리고 mysql이 설치가 되어 있어야 합니다. Mysql에 seed project용 데이터베이스를 만들고 activator로 프로젝트를 실행합니다.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># mysql-server를 설치(아래는 OSX Homebrew기준으로 설명합니다.)</span>
+brew install mysql
+mysqld <span class="c"># mysql-server 실행</span>
+
+<span class="c"># mysql table &amp; data 초기화</span>
+<span class="nb">cd </span>finatra-starter
+mysql <span class="nt">-u</span> root &lt; sql/1.sql
+
+<span class="c"># finatra server 실행</span>
+bin/activator run <span class="c"># git clone을 받은 경우 `sbt run`을 실행합니다.</span>
+...
+<span class="o">[</span>info] Loading project definition from finatra-starter/project
+<span class="o">[</span>info] Set current project to finatra-starter<span class="o">(</span><span class="k">in </span>build file:finatra-starter/<span class="o">)</span>
+<span class="o">[</span>info] Running com.github.ikhoon.FinatraServerMain
+...
+</code></pre></div></div>
+
+<h3 id="step-3-controller-와-route-추가하기">Step 3. Controller 와 Route 추가하기</h3>
+<p>Ping메시지를 보내면 pong 메시지를 응답하는 간단한 <a href="https://github.com/ikhoon/finatra-mysql-seed/blob/master/src/main/scala/com/github/ikhoon/app/v1/ping/PingController.scala">PingController</a>를 구현해보겠습니다. 기본 구현은 아래와 같습니다.
+<a href="http://www.sinatrarb.com/">Sinatra</a> 스타일의 HTTP 서버 개발 경험이 있다면 익숙한 표현 방식이라 생각이 됩니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// file: PingController.scala
+</span><span class="k">package</span> <span class="nn">com.github.ikhoon.app.v1.ping</span>
+
+<span class="k">import</span> <span class="nn">javax.inject.Inject</span>
+
+<span class="k">import</span> <span class="nn">com.google.inject.Singleton</span>
+<span class="k">import</span> <span class="nn">com.twitter.finagle.http.Request</span>
+<span class="k">import</span> <span class="nn">com.twitter.finatra.http.Controller</span>
+<span class="k">import</span> <span class="nn">com.twitter.util.Future</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Pong</span><span class="o">(</span><span class="n">pong</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+
+<span class="nd">@Singleton</span>
+<span class="k">class</span> <span class="nc">PingController</span> <span class="nd">@Inject</span><span class="o">()</span> <span class="o">()</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="o">{</span> <span class="c1">// finatra.http.Controller를 상속 받습니다.
+</span>
+  <span class="c1">// GET /ping URL을 처리하기 위한 router를 정의합니다.
+</span>  <span class="n">get</span><span class="o">(</span><span class="s">"/ping"</span><span class="o">)</span> <span class="o">{</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span> <span class="o">=&gt;</span>
+    <span class="nc">Future</span><span class="o">.</span><span class="n">value</span><span class="o">(</span><span class="nc">Pong</span><span class="o">(</span><span class="s">"pong"</span><span class="o">))</span>  <span class="c1">// 비동기 프로그래밍을 위해서 `Future`로 값을 감싸서 return 합니다.
+</span>  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>그리고 방금 정의한 PingController의 router를 FinatraServer에 등록합니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="nn">com.github.ikhoon</span>
+
+<span class="k">import</span> <span class="nn">com.github.ikhoon.app.v1.ping.PingController</span>
+<span class="k">import</span> <span class="nn">com.twitter.finagle.http.</span><span class="o">{</span> <span class="nc">Request</span><span class="o">,</span> <span class="nc">Response</span> <span class="o">}</span>
+<span class="k">import</span> <span class="nn">com.twitter.finatra.http.HttpServer</span>
+<span class="k">import</span> <span class="nn">com.twitter.finatra.http.routing.HttpRouter</span>
+
+<span class="k">object</span> <span class="nc">FinatraServerMain</span> <span class="k">extends</span> <span class="nc">FinatraServer</span>
+
+<span class="k">class</span> <span class="nc">FinatraServer</span> <span class="k">extends</span> <span class="nc">HttpServer</span> <span class="o">{</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">defaultFinatraHttpPort</span> <span class="k">=</span> <span class="s">":9999"</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">configureHttp</span><span class="o">(</span><span class="n">router</span><span class="k">:</span> <span class="kt">HttpRouter</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">router</span>
+      <span class="o">.</span><span class="n">add</span><span class="o">[</span><span class="kt">PingController</span><span class="o">]</span> <span class="c1">// Controller를 router에 등록합니다.
+</span>  <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>이제 등록한 Controller에 request를 날리기 위해서 <code class="highlighter-rouge">bin/activtor run</code> 혹은 <code class="highlighter-rouge">sbt run</code> 을 통해서 프로젝트를 실행합니다. 실행후 브라우져나 <code class="highlighter-rouge">curl</code>로 command line에서 결과를 확인할 수 있습니다.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-L</span> <span class="nt">-v</span> localhost:9999/ping
+<span class="k">*</span>   Trying ::1...
+<span class="k">*</span> Connected to localhost <span class="o">(</span>::1<span class="o">)</span> port 9999 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> GET /ping HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9999
+<span class="o">&gt;</span> User-Agent: curl/7.43.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span>
+&lt; HTTP/1.1 200 OK
+&lt; Content-Type: application/json<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>utf-8
+&lt; Server: Finatra
+&lt; Date: ?, 01 5? 2016 13:02:40 GMT
+&lt; Content-Length: 15
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"pong"</span>:<span class="s2">"pong"</span><span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="step-4-async-http-programming-with-finagle-http-client">Step 4. Async Http Programming with Finagle Http Client</h3>
+<p>Finatra는 <a href="https://github.com/google/guice/wiki/Motivation">Google Guice</a>를 이용한 경량화 Dependency Injection 모듈을 이용하여 의존성 주입및 <a href="http://twitter.github.io/finatra/user-guide/testing/">유닛 테스트, Mock 테스트</a>를 할수 있습니다. Finagle Http Client를 의존성 주입하기 위해서는 접속할 서버의 정보(<code class="highlighter-rouge">host:port</code>)를 모듈을 생성하고 FinatraServer에 이를 등록해야 합니다. 이를 통해 Twitter Server Admin페이지에서 등록된 finagle client host의 에러를 감지 및 트래킹할 수 있습니다.</p>
+
+<p>Guice를 이용한 모듈을 만들기위해서는 <a href="http://twitter.github.io/finatra/user-guide/getting-started/#modules"><code class="highlighter-rouge">TwitterModule</code></a>을 상속 받아서 구현하면 됩니다.</p>
+
+<p>약간의 편의성을 위해서 <a href="https://github.com/twitter/finatra/blob/develop/httpclient/src/main/scala/com/twitter/finatra/httpclient/modules/HttpClientModule.scala">Finatra HttpClient 기본 모듈</a>을 상속받아 수정해 봅니다. <a href="https://github.com/twitter/finatra/blob/develop/httpclient/src/main/scala/com/twitter/finatra/httpclient/RequestBuilder.scala">finatra request builder</a>를 사용할 경우 <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23"><code class="highlighter-rouge">Host Header</code></a> 정보가 빠져서 HTTP통신이 되지 않아 <code class="highlighter-rouge">RequestBuilder</code>를 생성할 때 마다 Host Header를 넣어줘야하는데 이를 피하기 위해 Header에 Host정보를 기본값으로 미리 설정합니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">abstract</span> <span class="k">class</span> <span class="nc">BasicHttpClientModule</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">TwitterModule</span> <span class="o">{</span>
+
+  <span class="k">protected</span> <span class="k">def</span> <span class="n">provideHttpClient</span><span class="o">(</span><span class="n">mapper</span><span class="k">:</span> <span class="kt">FinatraObjectMapper</span><span class="o">,</span> <span class="n">host</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">port</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">80</span><span class="o">)</span><span class="k">:</span> <span class="kt">HttpClient</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="c1">// HttpClientmodule을 상속받으면서 값을 override합니다.
+</span>    <span class="k">val</span> <span class="n">httpClientModule</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">HttpClientModule</span> <span class="o">{</span>
+      <span class="k">override</span> <span class="k">def</span> <span class="n">dest</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">s</span><span class="s">"$host:$port"</span>
+      <span class="c1">// 기본 Header값을 override 하면서 Host값을 설정합니다.
+</span>      <span class="k">override</span> <span class="k">def</span> <span class="n">defaultHeaders</span><span class="k">:</span> <span class="kt">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Map</span><span class="o">(</span><span class="s">"Host"</span> <span class="o">-&gt;</span> <span class="n">host</span><span class="o">)</span>
+    <span class="o">}</span>
+    <span class="n">httpClientModule</span><span class="o">.</span><span class="n">provideHttpClient</span><span class="o">(</span><span class="n">mapper</span><span class="o">,</span> <span class="n">httpClientModule</span><span class="o">.</span><span class="n">provideHttpService</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>이제 실제 HTTP 통신을 할 서버의 host명과 port정보를 이용해서 HttpClientModule을 만듭니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">com.twitter.finatra.json.FinatraObjectMapper</span>
+<span class="k">import</span> <span class="nn">com.typesafe.config.Config</span>
+<span class="k">import</span> <span class="nn">net.ceedubs.ficus.Ficus._</span>
+<span class="k">import</span> <span class="nn">com.twitter.finatra.httpclient.modules.HttpClientModule</span>
+<span class="k">object</span> <span class="nc">FakeHttpClientModule</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">apply</span><span class="o">()</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">BasicHttpClientModule</span> <span class="o">{</span>
+    <span class="c1">// `fake`란 이름으로 의존성 주입될수 있도록 이름을 지어줌
+</span>    <span class="nd">@Named</span><span class="o">(</span><span class="s">"fake"</span><span class="o">)</span> <span class="nd">@Provides</span> <span class="nd">@Singleton</span>
+    <span class="c1">// jackson object mapper와 typesafe config를 의존성을 주입함
+</span>    <span class="k">def</span> <span class="n">provideHttpClient</span><span class="o">(</span><span class="n">mapper</span><span class="k">:</span> <span class="kt">FinatraObjectMapper</span><span class="o">,</span> <span class="n">config</span><span class="k">:</span> <span class="kt">Config</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+      <span class="c1">// 위에서 만들었던 `BasicHttpClientModule#provideHttpClient`를 호출하면서
+</span>      <span class="c1">// typesafe config에 설정되어 있는 fake.host, fake.port값을 가져와 넘겨줌
+</span>      <span class="k">super</span><span class="o">.</span><span class="n">provideHttpClient</span><span class="o">(</span><span class="n">mapper</span><span class="o">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">as</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="s">"fake.host"</span><span class="o">),</span> <span class="n">config</span><span class="o">.</span><span class="n">as</span><span class="o">[</span><span class="kt">Int</span><span class="o">](</span><span class="s">"fake.port"</span><span class="o">))</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>위에서 만든 FakeHttpClientModule을 FinatraServer에 등록을 합니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FinatraServer</span> <span class="k">extends</span> <span class="nc">HttpServer</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">modules</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span><span class="nc">FakeHttpClientModule</span><span class="o">())</span>
+  <span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>그리고 실제 비지니스 로직을 구현할 FakeService를 만들어 보겠습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">javax.inject.</span><span class="o">{</span> <span class="nc">Inject</span><span class="o">,</span> <span class="nc">Named</span> <span class="o">}</span>
+
+<span class="k">import</span> <span class="nn">com.fasterxml.jackson.databind.JsonNode</span>
+<span class="k">import</span> <span class="nn">com.twitter.finatra.httpclient.</span><span class="o">{</span> <span class="nc">HttpClient</span><span class="o">,</span> <span class="nc">RequestBuilder</span> <span class="o">}</span>
+<span class="k">import</span> <span class="nn">com.twitter.util.Future</span>
+<span class="k">import</span> <span class="nn">com.typesafe.config.Config</span>
+<span class="k">import</span> <span class="nn">net.ceedubs.ficus.Ficus._</span>
+
+<span class="c1">// @Named("fake") 어노테이션을 이용하여 위에서 정의한 HttpClient의 의존성을 주입합니다.
+</span><span class="k">class</span> <span class="nc">FakeService</span> <span class="nd">@Inject</span><span class="o">()</span> <span class="o">(</span><span class="nd">@Named</span><span class="o">(</span><span class="s">"fake"</span><span class="o">)</span> <span class="n">httpClient</span><span class="k">:</span> <span class="kt">HttpClient</span><span class="o">,</span> <span class="n">config</span><span class="k">:</span> <span class="kt">Config</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">withSleepAsync</span><span class="o">(</span><span class="n">sec</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">JsonNode</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="n">config</span><span class="o">.</span><span class="n">as</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="s">"fake.host"</span><span class="o">)</span> <span class="o">+</span> <span class="n">s</span><span class="s">"?sleep=$sec"</span>
+    <span class="n">httpClient</span><span class="o">.</span><span class="n">executeJson</span><span class="o">[</span><span class="kt">JsonNode</span><span class="o">](</span><span class="nc">RequestBuilder</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">url</span><span class="o">))</span>
+  <span class="o">}</span>
+
+  <span class="k">def</span> <span class="n">withSleepSync</span><span class="o">(</span><span class="n">sec</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">JsonNode</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="n">config</span><span class="o">.</span><span class="n">as</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="s">"fake.host"</span><span class="o">)</span> <span class="o">+</span> <span class="n">s</span><span class="s">"?sleep=$sec"</span>
+    <span class="k">val</span> <span class="n">jsonNode</span> <span class="k">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="n">executeJson</span><span class="o">[</span><span class="kt">JsonNode</span><span class="o">](</span><span class="nc">RequestBuilder</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">url</span><span class="o">))</span>
+    <span class="c1">// 의도적으로 Blocking IO를 유발함
+</span>    <span class="nc">Await</span><span class="o">.</span><span class="n">result</span><span class="o">(</span><span class="n">jsonNode</span><span class="o">,</span> <span class="nc">Duration</span><span class="o">.</span><span class="n">fromSeconds</span><span class="o">(</span><span class="mi">100</span><span class="o">))</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>FakeService를 FakeController를 만들어서 Guice를 통한 의존성 주입 &amp; method 호출을 하고</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">javax.inject.Inject</span>
+
+<span class="k">import</span> <span class="nn">com.github.ikhoon.swagger.SimpleSwaggerSupport</span>
+<span class="k">import</span> <span class="nn">com.twitter.finagle.http.Request</span>
+<span class="k">import</span> <span class="nn">com.twitter.finatra.http.Controller</span>
+
+
+<span class="k">class</span> <span class="nc">FakeController</span> <span class="nd">@Inject</span><span class="o">()</span> <span class="o">(</span><span class="n">fakeService</span><span class="k">:</span> <span class="kt">FakeService</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="o">{</span>
+  <span class="n">get</span><span class="o">(</span><span class="s">"/sleep/:id/async"</span><span class="o">)</span> <span class="o">{</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span> <span class="o">=&gt;</span>
+    <span class="n">fakeService</span><span class="o">.</span><span class="n">withSleepAsync</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="n">getIntParam</span><span class="o">(</span><span class="s">"id"</span><span class="o">))</span>
+  <span class="o">}</span>
+
+  <span class="n">get</span><span class="o">(</span><span class="s">"/sleep/:id/sync"</span><span class="o">)</span> <span class="o">{</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span> <span class="o">=&gt;</span>
+    <span class="n">fakeService</span><span class="o">.</span><span class="n">withSleepSync</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="n">getIntParam</span><span class="o">(</span><span class="s">"id"</span><span class="o">))</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>FakeController를 다시 FinatraServer의 라우터에 등록을 합니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FinatraServer</span> <span class="k">extends</span> <span class="nc">HttpServer</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">modules</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span><span class="nc">FakeHttpClientModule</span><span class="o">())</span>
+  <span class="o">...</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">configureHttp</span><span class="o">(</span><span class="n">router</span><span class="k">:</span> <span class="kt">HttpRouter</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">router</span>
+      <span class="o">.</span><span class="n">add</span><span class="o">[</span><span class="kt">FakeController</span><span class="o">]</span>  <span class="c1">// FakeController를 라우터에 등록
+</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="asynchronous-vs-synchronous">Asynchronous vs Synchronous</h3>
+<p>이제 간단히 동작할수 있는 비동기 프로그램이 완성이 되었습니다. 이를 간단한 벤치마크를 통해서 async와 sync의 결과값을 비교해보겠습니다.
+<img src="/files/monad-async-vs-sync.png" alt="async와 sync의 성능 비교" />
+위의 코드를 실행결과를 보면 4초의 IO Waiting이 걸리는 외부와 통신을 할때</p>
+
+<ul>
+  <li>Sync IO - 6개의 request를 처리하는데 약 17초가 걸렸습니다. Thread가 blocking되기 때문에 동기화 코드는 서버의 <code class="highlighter-rouge">가용 thread 수</code>가 성능이 중요한 포인트가 됩니다.</li>
+  <li>Async IO - 같은 서버에 6개의 request를 처리하는데 약 4.3초가 걸렸습니다. 여러개의 request가 비동기로 병렬로 처리가 되었습니다.</li>
+</ul>
+
+<p>Async 코드에 대해서 Client의 Request를 50개까지 늘려서 성능을 측정해보겠습니다.
+<img src="/files/monad-async-50-threads.png" alt="50개 thread를 이용한 async 성능 측정" /></p>
+
+<ul>
+  <li>정확한 수치는 아니지만 50개의 request를 처리하는데 15초가 걸렸습니다. Async IO는 4초의 waiting이 발생하는 외부와 통신에서도 많은 수의 request에 대해서도 동시 처리가 가능합니다.</li>
+</ul>
+
+<blockquote>
+  <p>밴치마크에 사용한 코드는 ruby로 아래와 같이 작성하였습니다.</p>
+</blockquote>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env ruby</span>
+<span class="c1"># finatra_slow_request_benchmark.rb</span>
+<span class="nb">require</span> <span class="s1">'logger'</span>
+<span class="nb">require</span> <span class="s2">"rubygems"</span>
+<span class="nb">require</span> <span class="s1">'net/http'</span>
+
+<span class="no">LOG</span> <span class="o">=</span> <span class="no">Logger</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">STDOUT</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="no">ARGV</span><span class="p">.</span><span class="nf">size</span> <span class="o">!=</span> <span class="mi">3</span>
+  <span class="nb">puts</span> <span class="s2">"usage </span><span class="si">#{</span><span class="vg">$0</span><span class="si">}</span><span class="s2"> [mode(sync|async)] [thread_size] [iteration_size]"</span>
+  <span class="nb">exit</span>
+<span class="k">end</span>
+
+<span class="no">MODE</span> <span class="o">=</span> <span class="no">ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="no">THREAD_SIZE</span> <span class="o">=</span> <span class="no">ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">to_i</span>
+<span class="no">ITERATION_SIZE</span> <span class="o">=</span> <span class="no">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nf">to_i</span>
+
+<span class="no">SYNC_SLOW_URI</span> <span class="o">=</span> <span class="no">URI</span><span class="p">(</span><span class="s2">"http://localhost:9999/sleep/4/sync"</span><span class="p">)</span>
+<span class="no">ASYNC_SLOW_URI</span> <span class="o">=</span> <span class="no">URI</span><span class="p">(</span><span class="s2">"http://localhost:9999/sleep/4/async"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">init</span>
+  <span class="no">Net</span><span class="o">::</span><span class="no">HTTP</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="no">URI</span><span class="p">(</span><span class="s2">"http://localhost:9999"</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">request_url</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+    <span class="p">(</span><span class="mi">1</span><span class="o">..</span><span class="no">ITERATION_SIZE</span><span class="p">).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span> <span class="n">count</span> <span class="o">|</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="no">Net</span><span class="o">::</span><span class="no">HTTP</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+      <span class="no">LOG</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Thread-</span><span class="si">#{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">, row : </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">uri</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">begin</span>
+  <span class="n">init</span>
+  <span class="n">start</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">new</span>
+  <span class="no">LOG</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Start!!"</span>
+  <span class="n">uri</span> <span class="o">=</span> <span class="no">MODE</span> <span class="o">==</span> <span class="s1">'sync'</span> <span class="p">?</span> <span class="no">SYNC_SLOW_URI</span> <span class="p">:</span> <span class="no">ASYNC_SLOW_URI</span>
+
+  <span class="p">(</span><span class="mi">1</span><span class="o">..</span><span class="no">THREAD_SIZE</span><span class="p">).</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span> <span class="n">tid</span> <span class="o">|</span> <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="n">request_url</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span> <span class="p">}</span> <span class="p">}.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span> <span class="n">t</span> <span class="o">|</span> <span class="n">t</span><span class="p">.</span><span class="nf">join</span> <span class="p">}</span>
+
+  <span class="n">stop</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">new</span>
+
+  <span class="no">LOG</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Stop!!"</span>
+  <span class="n">elapsed</span> <span class="o">=</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">start</span>
+
+  <span class="no">LOG</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Elapsed : </span><span class="si">#{</span><span class="n">elapsed</span><span class="si">}</span><span class="s2">(sec)"</span>
+  <span class="n">executed_queries</span> <span class="o">=</span> <span class="no">THREAD_SIZE</span> <span class="o">*</span> <span class="no">ITERATION_SIZE</span>
+  <span class="n">tps</span> <span class="o">=</span> <span class="n">executed_queries</span> <span class="o">/</span> <span class="n">elapsed</span>
+  <span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="no">THREAD_SIZE</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">tps</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">executed_queries</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h2 id="monad-transformers---보다-효율적인-비동기-프로그래밍-하기">Monad Transformers - 보다 효율적인 비동기 프로그래밍 하기</h2>
+<p>아직은 단순한 케이스의 대해서만 비동기 프로그래밍을 했습니다.
+실제 웹서비스를 개발하다 보면 다양한 복잡한 케이스에 만나게 됩니다.</p>
+
+<p>주문 서버에서 주문 리스트를 가져오고 아이템 서버로 각각의 주문의 상품에 대해서 데이터를 비동기로 가져오는 것을 구현해보겠습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 주문내역을 가져오는 API
+</span><span class="k">case</span> <span class="k">class</span> <span class="nc">Order</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">userId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span> <span class="n">addr</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Item</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">price</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">orders</span> <span class="k">=</span> <span class="nc">Map</span><span class="o">(</span>
+  <span class="mi">1</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Order</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="s">"Seoul"</span><span class="o">),</span> <span class="nc">Order</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="s">"Seoul"</span><span class="o">)),</span>
+  <span class="mi">2</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Order</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="s">"Tokyo"</span><span class="o">),</span> <span class="nc">Order</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="s">"Tokyo"</span><span class="o">)),</span>
+  <span class="mi">3</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Order</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="s">"NewYork"</span><span class="o">),</span><span class="nc">Order</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="s">"NewYork"</span><span class="o">)),</span>
+  <span class="mi">4</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Order</span><span class="o">(</span><span class="mi">7</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="s">"Daegu"</span><span class="o">),</span> <span class="nc">Order</span><span class="o">(</span><span class="mi">8</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="s">"Daegu"</span><span class="o">))</span>
+<span class="o">)</span>
+
+<span class="k">val</span> <span class="n">orderItems</span> <span class="k">=</span> <span class="nc">Map</span><span class="o">(</span>
+  <span class="mi">1</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"I1"</span><span class="o">,</span> <span class="mi">2000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"I2"</span><span class="o">,</span> <span class="mi">4000</span><span class="o">)),</span>
+  <span class="mi">2</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"I2"</span><span class="o">,</span> <span class="mi">4000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">"I3"</span><span class="o">,</span> <span class="mi">6000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"I4"</span><span class="o">,</span> <span class="mi">8000</span><span class="o">)),</span>
+  <span class="mi">3</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">"I3"</span><span class="o">,</span> <span class="mi">6000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"I4"</span><span class="o">,</span> <span class="mi">8000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">"I5"</span><span class="o">,</span> <span class="mi">10000</span><span class="o">)),</span>
+  <span class="mi">4</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"I4"</span><span class="o">,</span> <span class="mi">4000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">"I5"</span><span class="o">,</span> <span class="mi">10000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="s">"I6"</span><span class="o">,</span> <span class="mi">12000</span><span class="o">)),</span>
+  <span class="mi">5</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"I1"</span><span class="o">,</span> <span class="mi">2000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"I2"</span><span class="o">,</span> <span class="mi">4000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">"I3"</span><span class="o">,</span> <span class="mi">6000</span><span class="o">)),</span>
+  <span class="mi">6</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"I2"</span><span class="o">,</span> <span class="mi">4000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"I4"</span><span class="o">,</span> <span class="mi">8000</span><span class="o">)),</span>
+  <span class="mi">7</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">"I3"</span><span class="o">,</span> <span class="mi">6000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"I4"</span><span class="o">,</span> <span class="mi">8000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">"I5"</span><span class="o">,</span> <span class="mi">10000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="s">"I6"</span><span class="o">,</span> <span class="mi">12000</span><span class="o">)),</span>
+  <span class="mi">8</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">Item</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"I4"</span><span class="o">,</span> <span class="mi">4000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">"I5"</span><span class="o">,</span> <span class="mi">10000</span><span class="o">),</span> <span class="nc">Item</span><span class="o">(</span><span class="mi">7</span><span class="o">,</span> <span class="s">"I7"</span><span class="o">,</span> <span class="mi">14000</span><span class="o">))</span>
+<span class="o">)</span>
+
+<span class="c1">// 주문내역을 가져오는 API
+</span><span class="k">def</span> <span class="n">getOrders</span><span class="o">(</span><span class="n">userId</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Order</span><span class="o">]]</span> <span class="k">=</span> <span class="nc">Future</span><span class="o">.</span><span class="n">successful</span><span class="o">(</span><span class="n">orders</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">userId</span><span class="o">).</span><span class="n">get</span><span class="o">)</span>
+<span class="c1">// 주문의 상품 내역을 가져오는 API
+</span><span class="k">def</span> <span class="n">getOrderItems</span><span class="o">(</span><span class="n">order</span><span class="k">:</span> <span class="kt">Order</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]</span> <span class="k">=</span> <span class="nc">Future</span><span class="o">.</span><span class="n">successful</span><span class="o">(</span><span class="n">orderItems</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">order</span><span class="o">.</span><span class="n">id</span><span class="o">).</span><span class="n">get</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>여기서의 중요한 포인트는 Future안에 List가 들어있다는 것입니다. 주문의 상품내역을 가져오려면 List에서 다시 Order를 추출해내야합니다.
+우선 scala의 <code class="highlighter-rouge">for comprehension</code> 만을 이용하여 데이터를 비동기로 가져와 보겠습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">scala.concurrent.Future</span>
+<span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.global</span>
+
+<span class="k">val</span> <span class="n">userId</span> <span class="k">=</span> <span class="mi">1</span>
+<span class="k">val</span> <span class="n">orderItems</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+  <span class="c1">// 비동기로 유저의 상품내역을 가져옴
+</span>  <span class="n">orderList</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Order</span><span class="o">]</span> <span class="k">&lt;-</span> <span class="n">getOrders</span><span class="o">(</span><span class="n">userId</span><span class="o">)</span>
+  <span class="c1">// 주문 상품내역을 추출하기 위해서는 List에서 Order값을 가져와야함
+</span>  <span class="n">itemList</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]</span> <span class="k">&lt;-</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">itemListFutureList</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]]</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+        <span class="n">order</span> <span class="k">&lt;-</span> <span class="n">orderList</span>
+      <span class="o">}</span> <span class="k">yield</span> <span class="n">getOrderItems</span><span class="o">(</span><span class="n">order</span><span class="o">)</span>
+    <span class="c1">// itemListFutureList가 List안에 Future가 들어있기 때문에 Future의 sequence 함수를 통해서 순서를 변경합니다.
+</span>    <span class="k">val</span> <span class="n">itemFutureListList</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]]</span> <span class="k">=</span> <span class="nc">Future</span><span class="o">.</span><span class="n">sequence</span><span class="o">(</span><span class="n">itemListFutureList</span><span class="o">)</span>
+    <span class="c1">// 변경된 Future안에 List가 중첩해서 들어있기 때문에 flatten 함수를 이용해서 이를 없애줍니다.
+</span>    <span class="k">val</span> <span class="n">itemFutureList</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Item</span><span class="o">]]</span> <span class="k">=</span> <span class="n">itemFutureListList</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">flatten</span><span class="o">)</span>
+    <span class="c1">// 이제 itemFutureList는 상위 for comprehension을 돌수있는 monad의 형태 Future[M[T]]의 형태가 되었습니다.
+</span>    <span class="n">itemFutureList</span>
+  <span class="o">}</span>
+<span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">itemList</span><span class="o">)</span>
+<span class="n">orderItems</span><span class="o">.</span><span class="n">foreach</span><span class="o">(</span><span class="n">println</span><span class="o">)</span>
+<span class="c1">// List(Item(1,I1,2000), Item(2,I2,4000), Item(2,I2,4000), Item(3,I3,6000), Item(4,I4,8000))
+</span></code></pre></div></div>
+
+<p>위의 코드는 로직이 복잡하고 가독성도 떨어집니다. 실제 사용이 거의 불가능한 코드라 생각이 됩니다.
+기존의 for comprehension은 중첩된 모나드를 효율적으로 처리할수 없습니다.
+하지만 <a href="http://eed3si9n.com/learning-scalaz/Monad+transformers.html">Monad Transformers</a>란 개념을 활용하면 새로운 <code class="highlighter-rouge">flatMap(A =&gt; Future[List[B]])</code> 함수를 만들고 이를 간단하게 처리할수 있습니다. 😊</p>
+
+<h3 id="첫번째-monad-transformer-만들어-보기---futureseq">첫번째 Monad Transformer 만들어 보기 - <code class="highlighter-rouge">FutureSeq</code></h3>
+<p>Monad Transformer를 만들기위해서 <code class="highlighter-rouge">FutureSeq</code>라는 case class를 하나 만들고 인자로 <code class="highlighter-rouge">Future[Seq[A]]</code>를 받도록 합니다.
+<code class="highlighter-rouge">List</code>는 <code class="highlighter-rouge">Seq</code>를 상속 받기 때문에 <code class="highlighter-rouge">Future[List[A]]</code>도 인자로 받을수 있게 됩니다.
+그리고 <code class="highlighter-rouge">flatMap</code>, <code class="highlighter-rouge">map</code>, <code class="highlighter-rouge">filter</code> 그리고 <code class="highlighter-rouge">withfilter</code>를 구현해주면 됩니다.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">flatMap</code> 함수는 for comprehension에서 <code class="highlighter-rouge">&lt;-</code> 연산을 가능하게 합니다 <code class="highlighter-rouge">for { a &lt;- ma }</code></li>
+  <li><code class="highlighter-rouge">withFilter</code> 함수는 for 문 안에서 <code class="highlighter-rouge">if</code> 조건을 사용 할수 있게 합니다. <code class="highlighter-rouge">for { a &lt;- ma if a == 10 }</code></li>
+</ul>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">case</span> <span class="k">class</span> <span class="nc">FutureSeq</span><span class="o">[</span><span class="kt">+A</span><span class="o">](</span><span class="n">future</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Seq</span><span class="o">[</span><span class="kt">A</span><span class="o">]])</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">flatMap</span><span class="o">[</span><span class="kt">B</span><span class="o">](</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="nc">FutureSeq</span><span class="o">[</span><span class="kt">B</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureSeq</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">FutureSeq</span><span class="o">(</span><span class="n">future</span><span class="o">.</span><span class="n">flatMap</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="n">a</span> <span class="k">=&gt;</span> <span class="nc">Future</span><span class="o">.</span><span class="n">sequence</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">f</span> <span class="n">andThen</span> <span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">future</span><span class="o">))).</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">flatten</span><span class="o">)</span>
+    <span class="o">})</span>
+
+  <span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">B</span><span class="o">](</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureSeq</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="nc">FutureSeq</span><span class="o">(</span><span class="n">future</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">f</span><span class="o">)))</span>
+
+  <span class="k">def</span> <span class="n">filter</span><span class="o">(</span><span class="n">p</span><span class="k">:</span> <span class="kt">A</span> <span class="k">⇒</span> <span class="kt">Boolean</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureSeq</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">withFilter</span><span class="o">(</span><span class="n">p</span><span class="o">)(</span><span class="n">ec</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="n">withFilter</span><span class="o">(</span><span class="n">p</span><span class="k">:</span> <span class="kt">A</span> <span class="k">⇒</span> <span class="kt">Boolean</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureSeq</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">FutureSeq</span><span class="o">(</span><span class="n">future</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">p</span><span class="o">)))</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>이제 FutureSeq monad transformer를 만들었으니 위의 주문내역을 가져오는 코드를 리팩토링 해보겠습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">scala.concurrent.Future</span>
+<span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.global</span>
+<span class="k">val</span> <span class="n">orderItems</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+  <span class="n">order</span><span class="k">:</span> <span class="kt">Order</span> <span class="kt">&lt;-</span> <span class="kt">FutureSeq</span><span class="o">(</span><span class="kt">getOrders</span><span class="o">(</span><span class="kt">userId</span><span class="o">))</span>
+  <span class="kt">item:</span> <span class="kt">Item</span> <span class="kt">&lt;-</span> <span class="kt">FutureSeq</span><span class="o">(</span><span class="kt">getOrderItems</span><span class="o">(</span><span class="kt">order</span><span class="o">))</span>
+<span class="o">}</span> <span class="k">yield</span> <span class="n">item</span>
+<span class="n">orderItems</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">foreach</span><span class="o">(</span><span class="n">println</span><span class="o">)</span>
+<span class="c1">// List(Item(1,I1,2000), Item(2,I2,4000), Item(2,I2,4000), Item(3,I3,6000), Item(4,I4,8000))
+</span></code></pre></div></div>
+
+<p>Monad Transformer를 통해서 훨씬 가독성이 좋고 유지보수하기 좋은 코드로 바뀌었습니다.</p>
+
+<p>위의 코드를 scalaz에 있는 <a href="https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/ListT.scala">ListT Monad Transformers</a>를 활용하면 아래와 같이 사용할수 있다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">scalaz._</span>
+<span class="k">import</span> <span class="nn">Scalaz._</span>
+<span class="k">import</span> <span class="nn">ListT._</span>
+<span class="k">import</span> <span class="nn">scala.concurrent.Future</span>
+<span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.global</span>
+<span class="k">val</span> <span class="n">orderItems</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+  <span class="n">order</span><span class="k">:</span> <span class="kt">Order</span> <span class="kt">&lt;-</span> <span class="kt">listT</span><span class="o">(</span><span class="kt">getOrders</span><span class="o">(</span><span class="kt">userId</span><span class="o">))</span>
+  <span class="kt">item:</span> <span class="kt">Item</span> <span class="kt">&lt;-</span> <span class="kt">listT</span><span class="o">(</span><span class="kt">getOrderItems</span><span class="o">(</span><span class="kt">order</span><span class="o">))</span>
+<span class="o">}</span> <span class="k">yield</span> <span class="n">item</span>
+<span class="n">orderItems</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">foreach</span><span class="o">(</span><span class="n">println</span><span class="o">)</span>
+<span class="c1">// List(Item(1,I1,2000), Item(2,I2,4000), Item(2,I2,4000), Item(3,I3,6000), Item(4,I4,8000))
+</span></code></pre></div></div>
+
+<p>위에 직접 만든 Monad Transformer와 같은 역할을 하게 되고 코드량도 거의 같습니다.</p>
+
+<h3 id="두번째-monad-transformer-만들어보기---futureoption">두번째 Monad Transformer 만들어보기 - <code class="highlighter-rouge">FutureOption</code></h3>
+
+<p>Web application을 개발하다보면 Database와의 연동 작업, 특정 키값으로 데이터를 조회하는 일이 많이 있습니다.
+Java에서는 데이터가 없는 경우에 null이 반환되지만 Scala에서는 nullable한 데이터에 대해서는 <code class="highlighter-rouge">Option[T]</code>로 표현을 합니다.</p>
+
+<p>특정 유저의 email을 가지고 그 유저의 현재 남아 있는 point를 조회하는 로직을 구현해보겠습니다.
+우선 <a href="http://getquill.io/">Quill</a>과 finagle-mysql의 조합으로 Mysql에 들어있는 데이터를 조회해보도록 하겠습니다.</p>
+
+<p>Users Table 조회</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">javax.inject.</span><span class="o">{</span> <span class="nc">Inject</span><span class="o">,</span> <span class="nc">Singleton</span> <span class="o">}</span>
+<span class="k">import</span> <span class="nn">java.util.Date</span>
+<span class="k">import</span> <span class="nn">com.github.ikhoon.modules.QuillDatabaseModule.QuillDatabaseSource</span>
+<span class="k">import</span> <span class="nn">com.twitter.util.Future</span>
+<span class="k">import</span> <span class="nn">io.getquill._</span>
+
+<span class="c1">// Users 테이블의 모델 정의
+</span><span class="k">case</span> <span class="k">class</span> <span class="nc">Users</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">createdAt</span><span class="k">:</span> <span class="kt">Date</span><span class="o">)</span>
+
+<span class="nd">@Singleton</span>
+<span class="k">class</span> <span class="nc">QuillUserRepository</span> <span class="nd">@Inject</span><span class="o">()</span> <span class="o">(</span><span class="n">db</span><span class="k">:</span> <span class="kt">QuillDatabaseSource</span><span class="o">)</span> <span class="o">{</span>
+
+  <span class="c1">// Email을 가지고 user 정보를 가져오는 쿼리 수행
+</span>  <span class="k">def</span> <span class="n">findByEmail</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Users</span><span class="o">]]</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">q</span> <span class="k">=</span> <span class="n">quote</span> <span class="o">{</span> <span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="n">query</span><span class="o">[</span><span class="kt">Users</span><span class="o">].</span><span class="n">filter</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span> <span class="n">i</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span><span class="o">).</span><span class="n">take</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+    <span class="o">}</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="o">(</span><span class="n">q</span><span class="o">)(</span><span class="n">email</span><span class="o">).</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">headOption</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Point Table 조회</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">import</span> <span class="nn">javax.inject.</span><span class="o">{</span> <span class="nc">Inject</span><span class="o">,</span> <span class="nc">Singleton</span> <span class="o">}</span>
+<span class="k">import</span> <span class="nn">java.util.Date</span>
+<span class="k">import</span> <span class="nn">com.github.ikhoon.modules.QuillDatabaseModule._</span>
+<span class="k">import</span> <span class="nn">com.twitter.util.Future</span>
+<span class="k">import</span> <span class="nn">io.getquill._</span>
+
+<span class="c1">// Points 테이블의 모델 정의
+</span><span class="k">case</span> <span class="k">class</span> <span class="nc">Points</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">userId</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">point</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">createdAt</span><span class="k">:</span> <span class="kt">Date</span><span class="o">)</span>
+
+<span class="nd">@Singleton</span>
+<span class="k">class</span> <span class="nc">QuillPointRepository</span> <span class="nd">@Inject</span><span class="o">()</span> <span class="o">(</span><span class="n">db</span><span class="k">:</span> <span class="kt">QuillDatabaseSource</span><span class="o">)</span> <span class="o">{</span>
+
+  <span class="c1">// Uesr ID를 가지고 포인트 정보를 가져오는 쿼리수행
+</span>  <span class="k">def</span> <span class="n">findByUserId</span><span class="o">(</span><span class="n">userId</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Points</span><span class="o">]]</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">q</span> <span class="k">=</span> <span class="n">quote</span> <span class="o">{</span> <span class="o">(</span><span class="n">userId</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="n">query</span><span class="o">[</span><span class="kt">Points</span><span class="o">].</span><span class="n">filter</span><span class="o">(</span><span class="n">p</span> <span class="k">=&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">userId</span> <span class="o">==</span> <span class="n">userId</span><span class="o">).</span><span class="n">take</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+    <span class="o">}</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="o">(</span><span class="n">q</span><span class="o">)(</span><span class="n">userId</span><span class="o">).</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">headOption</span><span class="o">)</span>
+  <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>이제 두개의 유저의 email을 가지고 point를 가져와 보겠습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserPointService</span> <span class="nd">@Inject</span><span class="o">()</span> <span class="o">(</span>
+  <span class="n">quillUserRepository</span><span class="k">:</span>  <span class="kt">QuillUserRepository</span><span class="o">,</span>
+  <span class="n">quillPointRepository</span><span class="k">:</span> <span class="kt">QuillPointRepository</span>
+<span class="o">)</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">getPointByUserEmail</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Points</span><span class="o">]]</span> <span class="k">=</span>
+    <span class="k">for</span> <span class="o">{</span>
+      <span class="n">userOption</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Users</span><span class="o">]</span> <span class="k">&lt;-</span> <span class="n">quillUserRepository</span><span class="o">.</span><span class="n">findByEmail</span><span class="o">(</span><span class="n">email</span><span class="o">)</span>
+      <span class="c1">// option 타입이기 때문에 quillPointRepository.findByUserid 를 호출할수 없기 때문에 pattern matching 을 통해서 이부분을 해결합니다.
+</span>      <span class="n">pointOption</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Points</span><span class="o">]</span> <span class="k">&lt;-</span> <span class="n">userOption</span> <span class="k">match</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">user</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">quillPointRepository</span><span class="o">.</span><span class="n">findByUserId</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="o">)</span>
+        <span class="k">case</span> <span class="k">_</span>          <span class="k">=&gt;</span> <span class="nc">Future</span><span class="o">.</span><span class="n">value</span><span class="o">(</span><span class="nc">None</span><span class="o">)</span>
+      <span class="o">}</span>
+    <span class="o">}</span> <span class="k">yield</span> <span class="n">pointOption</span>
+</code></pre></div></div>
+
+<p>Future안에 List가 있는 경우보다는 간단한 로직이지만 여전히 사용하기 불편합니다.
+이부분도 Monad Transformer를 활용해서 수정해보겠습니다.</p>
+
+<h3 id="option-monad-transformer-활용한-futureoptiont-데이터-조합">Option Monad Transformer 활용한 Future[Option[T]] 데이터 조합</h3>
+<p>특정값 A 를 받아서 <code class="highlighter-rouge">Future[Option[B]]</code>를 반환하는 <code class="highlighter-rouge">flatMap(A =&gt; Future[Option[B]])</code> 함수를 만들고 이를 통해서 Option Monad Transformer를 만들어 보겠습니다.
+기본 구조는 위의 <code class="highlighter-rouge">FutureSeq</code> 와 같습니다. 다만 내부 구현이 조금씩 차이가 납니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">case</span> <span class="k">class</span> <span class="nc">FutureOption</span><span class="o">[</span><span class="kt">+A</span><span class="o">](</span><span class="n">future</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]])</span> <span class="k">extends</span> <span class="nc">AnyVal</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">flatMap</span><span class="o">[</span><span class="kt">B</span><span class="o">](</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="nc">FutureOption</span><span class="o">[</span><span class="kt">B</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureOption</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">FutureOption</span><span class="o">(</span><span class="n">future</span><span class="o">.</span><span class="n">flatMap</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">).</span><span class="n">future</span>
+      <span class="k">case</span> <span class="nc">None</span>    <span class="k">=&gt;</span> <span class="nc">Future</span><span class="o">.</span><span class="n">value</span><span class="o">(</span><span class="nc">None</span><span class="o">)</span>
+    <span class="o">})</span>
+
+  <span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">B</span><span class="o">](</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureOption</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="nc">FutureOption</span><span class="o">(</span><span class="n">future</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">f</span><span class="o">)))</span>
+
+  <span class="k">def</span> <span class="n">filter</span><span class="o">(</span><span class="n">p</span><span class="k">:</span> <span class="kt">A</span> <span class="k">⇒</span> <span class="kt">Boolean</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureOption</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">withFilter</span><span class="o">(</span><span class="n">p</span><span class="o">)(</span><span class="n">ec</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="n">withFilter</span><span class="o">(</span><span class="n">p</span><span class="k">:</span> <span class="kt">A</span> <span class="k">⇒</span> <span class="kt">Boolean</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ec</span><span class="k">:</span> <span class="kt">ExecutionContext</span><span class="o">)</span><span class="k">:</span> <span class="kt">FutureOption</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">FutureOption</span><span class="o">(</span><span class="n">future</span><span class="o">.</span><span class="n">map</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">(</span><span class="n">a</span><span class="o">))</span> <span class="nc">Some</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="k">else</span> <span class="nc">None</span>
+      <span class="k">case</span> <span class="k">_</span>       <span class="k">=&gt;</span> <span class="nc">None</span>
+    <span class="o">})</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>이제 새롭게 만든 Option Monad Transformer를 활용해서 원래 코드를 수정해보겠습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="n">getPointByUserEmail</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Points</span><span class="o">]]</span> <span class="k">=</span>
+  <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+    <span class="n">user</span> <span class="k">&lt;-</span> <span class="nc">FutureOption</span><span class="o">(</span><span class="n">quillUserRepository</span><span class="o">.</span><span class="n">findByEmail</span><span class="o">(</span><span class="n">email</span><span class="o">))</span>
+    <span class="n">point</span> <span class="k">&lt;-</span> <span class="nc">FutureOption</span><span class="o">(</span><span class="n">quillPointRepository</span><span class="o">.</span><span class="n">findByUserId</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="o">))</span>
+  <span class="o">}</span> <span class="k">yield</span> <span class="n">point</span><span class="o">).</span><span class="n">future</span>
+</code></pre></div></div>
+
+<p>코드가 훨씬더 간결해지고 편리하게 두개의 함수의 결과값을 조합할 수 있습니다.
+<code class="highlighter-rouge">FutureOption</code> 또한 scalaz의 <code class="highlighter-rouge">OptionT Monad Transformer</code>를 사용하면 동일하게 구현할 수 있습니다.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">scalaz._</span>
+<span class="k">import</span> <span class="nn">Scalaz._</span>
+<span class="k">import</span> <span class="nn">OptionT._</span>
+<span class="k">import</span> <span class="nn">scala.concurrent.Future</span>
+<span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.global</span>
+<span class="k">def</span> <span class="n">getPointByUserEmail</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Points</span><span class="o">]]</span> <span class="k">=</span>
+  <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+    <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">optionT</span><span class="o">(</span><span class="n">quillUserRepository</span><span class="o">.</span><span class="n">findByEmail</span><span class="o">(</span><span class="n">email</span><span class="o">))</span>
+    <span class="n">point</span> <span class="k">&lt;-</span> <span class="n">optionT</span><span class="o">(</span><span class="n">quillPointRepository</span><span class="o">.</span><span class="n">findByUserId</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="o">))</span>
+  <span class="o">}</span> <span class="k">yield</span> <span class="n">point</span><span class="o">).</span><span class="n">run</span>
+</code></pre></div></div>
+
+<p>비동기 프로그래밍을 하다 보면 <code class="highlighter-rouge">Future</code>안에 감싸져 있는 값을 처리하기 쉽지 않은 경우가 종종 생깁니다.
+<a href="https://github.com/scalaz/scalaz/tree/series/7.3.x/core/src/main/scala/scalaz">Scalaz</a>에는 자주쓰이는 Monad Transformers에 대해서 구현이 되어 있습니다. <a href="https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/OptionT.scala">OptionT</a>, <a href="https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/EitherT.scala">EitherT</a>, <a href="https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/ListT.scala">ListT</a>, <a href="https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/StreamT.scala">StreamT</a>, <a href="https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/StateT.scala">StateT</a> 이외에 <a href="https://github.com/scalaz/scalaz/tree/series/7.3.x/core/src/main/scala/scalaz">다양한 Monad Transformers</a>가 존재합니다. 이를 통해서 다양한 Moand의 조합을 하고 풍부한, 간결한 비동기 프로그래밍을 할수 있을것이라 생각됩니다.
+또한 적절한 Monad Transformers를 찾아보고 없으면 직접 구현하는것도 또한 좋을것 방법이라 생각이 됩니다.</p>
+
+<p><a href="http://www.kakao.com/givepresent"><img src="https://gift-talk.kakao.com/public/angular_webapp/dist/images/wishes/bg_nodata.gif" alt="" /></a></p>
+
+<blockquote>
+  <h2 id="선물하기-개발팀-채용공고"><a href="http://www.kakaocorp.com/recruit/progressRecruit?uid=9702">선물하기 개발팀 채용공고</a></h2>
+  <p>카카오 선물하기 웹 프론트 &amp; 서버 개발자를 채용 중입니다.
+<a href="http://kakaocorp.com/recruit/progressRecruit?uid= 9702">지원하기</a></p>
+</blockquote>
+
+<ul>
+  <li>커버 이미지 출처: <a href="https://flic.kr/p/4k5Xvp">monad</a> © <a href="https://www.flickr.com/photos/icanchangethisright/">Bradley Gordon</a></li>
+</ul>
+
+</div>
+  <div id="post-footer">
+    
+    <a id="post-author" href="/authors/liam.m/">
+      <div id="author-image" style="background-image:url(/files/authors/liam.m.jpg);">
+        <span class="sr-only">liam.m's profile image</span>
+      </div>
+      <p id="author-name">liam.m</p>
+    </a>
+    <p id="post-date">2016-05-04 12:57</p>
+    <a id="post-more" href="/authors/liam.m/">
+      <span>Read more posts by this author</span>
+    </a>
+  </div>
+</div>
+
+<div class="container" style="margin-top:25px; padding:0px">
+  <a href="https://www.welcomekakao.com" target="_blank"><img src="/files/career2020.jpg" style="width:100%;"></a>
+</div>
+
+<div id="post-links" class="container">
+  
+  
+  <div id="post-prev" style="background-image: url(/files/covers/rubix-cube.jpg);" >
+    <div>
+      <h3><a href="/2016/04/27/rubics/">루빅스(RUBICS) - kakao의 실시간 추천 시스템</a></h3>
+      <p>YOU MIGHT ENJOY</p>
+    </div>
+  </div>
+  
+  
+  
+  <div id="post-next" style="background-image: url(/files/covers/swiss-army-knife.jpg);" >
+    <div>
+      <h3><a href="/2016/06/27/opensource-5-adt/">kakao의 오픈소스 Ep5 - Almighty Data Transmitter</a></h3>
+      <p>NEXT POST</p>
+    </div>
+  </div>
+  
+</div>
+
+<div id="lightbox">
+  <div id="lightbox-image"></div>
+</div>
+
+    <div class="clearfix"></div>
+
+    <a href="#" id="back-to-top"></a>
+</div>
+
+<div id="footer" class="container-fluid">
+    <ul id="links">
+        
+        <li>
+            <a id="link-github" href="http://github.com/kakao" target="_blank">
+                <span class="sr-only">github</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-facebook" href="http://facebook.com/nkakao" target="_blank">
+                <span class="sr-only">facebook</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-twitter" href="http://twitter.com/kakaodev" target="_blank">
+                <span class="sr-only">twitter</span>
+            </a>
+        </li>
+        
+        <li>
+            <a id="link-rss" href="/rss" target="_blank">
+                <span class="sr-only">rss</span>
+            </a>
+        </li>
+    </ul>
+    <ul id="footer-menu">
+        <li><a href="//www.kakaocorp.com">Kakao</a></li>
+        <li><a href="//careers.kakao.com/jobs">Jobs</a></li>
+        <li><a href="//privacy.kakaocorp.com">Privacy</a></li>
+    </ul>
+    <p id="copyright">
+        <a href="//www.kakaocorp.com">Copyright &copy; Kakao Corp.</a>
+        All rights reserved.
+    </p>
+</div><!--#footer-->
+
+
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-72007721-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+
+    <script type='text/javascript'>
+   //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    //Kakao.init('65d48e116d8b9409e08960c4800c3017');
+    function shareStory(abs_page_url) {
+        Kakao.Story.share({
+            url: abs_page_url,
+            text: '카카오 기술블로그 #개발자 #카카오'
+        });
+    }
+    //]]>
+</script>
+
+    
+    <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1204347326263800',
+    xfbml      : true,
+    version    : 'v2.7'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+    
+
+    
+    <script>!function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    }(document, 'script', 'twitter-wjs');
+</script>
+
+    
+
+    
+    <script src="https://apis.google.com/js/platform.js" async defer>
+    {
+        lang: 'ko'
+    }
+</script>
+
+    
+
+</body>
+</html>

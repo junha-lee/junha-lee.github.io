@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+
+
+<title>그래, 가끔 "Vim에서" GitHub을 보자!</title>
+<meta name="title" content="그래, 가끔 "Vim에서" GitHub을 보자!" />
+<meta name="author" content="jg.choi"/>
+<meta name="description" content="vimrc 건드리기 좋은 목요일입니다. ;) 기술 블로그 담당자가 글을 내놓으라고 닥달하니, 예전에 만들었던 플러그인이나 한번 꺼내볼까 합니다: https://github.com/junegunn/vim-github-dashboard Vim 상에서 GitHub API를 이용해 dashboard 페이지를 보여주는 플러그인입니다. 왜 멀쩡한 브라우저를 놔두고 이런 짓을 한 것이냐 물으신다면 … 그것 참 좋은 질문이네요. Vimscript 만 가지고는 API 결과를 받아오는 것이 불가능하므로 Ruby interface를 이용합니다만 (:help ruby) OS X 의 시스템 디폴트 Vim 에서 기본적으로 지원하기 때문에 사용하시는데 문제는 없을 겁니다. 제공하는 커맨드는 다음과 같습니다. GHDashboard[!] [user] 특정..."/>
+
+<meta property="fb:app_id" content="1204347326263800"/>
+
+<meta property="og:site_name" content="kakao 기술 블로그"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="그래, 가끔 "Vim에서" GitHub을 보자!"/>
+<meta property="og:description" content="vimrc 건드리기 좋은 목요일입니다. ;) 기술 블로그 담당자가 글을 내놓으라고 닥달하니, 예전에 만들었던 플러그인이나 한번 꺼내볼까 합니다: https://github.com/junegunn/vim-github-dashboard Vim 상에서 GitHub API를 이용해 dashboard 페이지를 보여주는 플러그인입니다. 왜 멀쩡한 브라우저를 놔두고 이런 짓을 한 것이냐 물으신다면 … 그것 참 좋은 질문이네요. Vimscript 만 가지고는 API 결과를 받아오는 것이 불가능하므로 Ruby interface를 이용합니다만 (:help ruby) OS X 의 시스템 디폴트 Vim 에서 기본적으로 지원하기 때문에 사용하시는데 문제는 없을 겁니다. 제공하는 커맨드는 다음과 같습니다. GHDashboard[!] [user] 특정..."/>
+<meta property="og:url" content="http://localhost:4000/2016/03/03/vim-github-dashboard/"/>
+<meta property="og:image" content="http://localhost:4000/files/covers/dashboard.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="그래, 가끔 "Vim에서" GitHub을 보자!"/>
+<meta name="twitter:description" content="vimrc 건드리기 좋은 목요일입니다. ;) 기술 블로그 담당자가 글을 내놓으라고 닥달하니, 예전에 만들었던 플러그인이나 한번 꺼내볼까 합니다: https://github.com/junegunn/vim-github-dashboard Vim 상에서 GitHub API를 이용해 dashboard 페이지를 보여주는 플러그인입니다. 왜 멀쩡한 브라우저를 놔두고 이런 짓을 한 것이냐 물으신다면 … 그것 참 좋은 질문이네요. Vimscript 만 가지고는 API 결과를 받아오는 것이 불가능하므로 Ruby interface를 이용합니다만 (:help ruby) OS X 의 시스템 디폴트 Vim 에서 기본적으로 지원하기 때문에 사용하시는데 문제는 없을 겁니다. 제공하는 커맨드는 다음과 같습니다. GHDashboard[!] [user] 특정..."/>
+<meta name="twitter:label1" content="Written by"/>
+<meta name="twitter:data1" content="jg.choi"/>
+<meta name="twitter:image:src" content="http://localhost:4000/files/covers/dashboard.jpg"/>
+
+<meta name="twitter:label2" content="Filed under"/>
+<meta name="twitter:data2" content="vim,vim-plugin,vim-github-dashboard"/>
+
+<meta property="article:tag" content="vim"/>
+
+<meta property="article:tag" content="vim-plugin"/>
+
+<meta property="article:tag" content="vim-github-dashboard"/>
+
+
+
+<meta property="article:published_time" content="2016-03-03T10:45:00+09:00"/>
+
+
+<meta property="article:author" content="http://localhost:4000/authors/jg.choi"/>
+
+<link href="http://localhost:4000/rss/" rel="alternate" type="application/rss+xml" title="RSS"/>
+<link href="/assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" type="image/png"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon-precomposed" type="image/png"/>
+<link href="/assets/lib/normalize.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/css/monokai.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/lib/magnific-popup.min.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/fonts/Kakao.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/css/screen.css" rel="stylesheet" type="text/css"/>
+<script>
+    if (window.location.host.indexOf('tech.kakao.com') > -1 && window.location.protocol == "https:"){
+        window.location = window.location.toString().replace(/^https:/, "http:");
+    }
+</script>
+
+</head>
+<body class="post-template">
+
+<div id="header">
+    <button id="menu-toggle" type="button">
+        <span class="sr-only">Toggle Navigation Menu</span>
+    </button>
+    <button id="search-toggle" type="button">
+        <span class="sr-only">Toggle Search Form</span>
+    </button>
+    <a id="logo" href="/">
+        <span class="sr-only">KakaoTech</span>
+    </a>
+    <div id="search">
+        <input id="search-input" type="search" placeholder="Search..." value="" />
+    </div>
+    <ul class="search__results" id="results-container"></ul>
+
+    <ul id="menu" class="nav">
+        <li class=" active "><a href="/">블로그</a></li>
+        <li class=""><a href="/opensource/">오픈소스</a></li>
+        <li class=""><a href="/openapi/">오픈API</a></li>
+        <li class=""><a href="/events/">기술행사</a></li>
+    </ul>
+</div>
+<!-- Script pointing to jekyll-search.js -->
+<script src="/dest/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '/search2.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: '<li>No results found</li>',
+        limit: 15,
+        fuzzy: false,
+        exclude: ['Welcome']
+    })
+</script><!-- #header -->
+
+
+
+<div id="wrapper">
+    <div id="navbar" class="container">
+  <h5><a id="link-back" href="/">Back to Posts</a></h5>
+  
+<ul id="shares">
+    <li class="stalk" style="display:none">
+        <a id="kakao-link-btn" href="javascript:;"></a>
+    </li>
+    <li>
+        <a id="share-kakaostory" href="javascript:shareStory('http://localhost:4000/2016/03/03/vim-github-dashboard/');"></a>
+    </li>
+
+    
+    <li>
+        <a id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/2016/03/03/vim-github-dashboard/"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="sr-only">Share to Facebook</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-twitter"
+           href="https://twitter.com/intent/tweet?text=%EA%B7%B8%EB%9E%98,%20%EA%B0%80%EB%81%94%20%22Vim%EC%97%90%EC%84%9C%22%20GitHub%EC%9D%84%20%EB%B3%B4%EC%9E%90!&url=http://localhost:4000/2016/03/03/vim-github-dashboard/">
+            <span class="sr-only">Share to Twitter</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-google" href="https://plus.google.com/share?url=http://localhost:4000/2016/03/03/vim-github-dashboard/"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+            <span class="sr-only">Share to Google+</span>
+        </a>
+    </li>
+    
+</ul>
+
+</div>
+
+<div id="cover" class="container" style="background-image: url(/files/covers/dashboard.jpg);" >
+  <div>
+    <h1>그래, 가끔 "Vim에서" GitHub을 보자!</h1>
+    <p>
+      
+      <a href="/tags/vim">vim</a>
+      ,
+      
+      <a href="/tags/vim-plugin">vim-plugin</a>
+      ,
+      
+      <a href="/tags/vim-github-dashboard">vim-github-dashboard</a>
+      
+      
+    </p>
+    
+
+
+  </div>
+</div>
+
+<div id="content" class="container post" role="main">
+  <div id="post-content"><p><code class="highlighter-rouge">vimrc</code> 건드리기 좋은 목요일입니다. ;)</p>
+
+<p>기술 블로그 담당자가 글을 내놓으라고 닥달하니, 예전에 만들었던 플러그인이나 한번 꺼내볼까 합니다:</p>
+
+<p>https://github.com/junegunn/vim-github-dashboard</p>
+
+<p><img src="/files/vim-ghd-1.png" alt="vim-github-dashboard 실행 화면" /></p>
+
+<p>Vim 상에서 <a href="https://developer.github.com/v3/">GitHub API</a>를 이용해 dashboard 페이지를 보여주는 플러그인입니다. 왜 멀쩡한 브라우저를 놔두고 이런 짓을 한 것이냐 물으신다면 … 그것 참 좋은 질문이네요.</p>
+
+<p>Vimscript 만 가지고는 API 결과를 받아오는 것이 불가능하므로 <a href="https://github.com/vim/vim/blob/master/runtime/doc/if_ruby.txt">Ruby interface</a>를 이용합니다만 (<code class="highlighter-rouge">:help ruby</code>) OS X 의 시스템 디폴트 Vim 에서 기본적으로 지원하기 때문에 사용하시는데 문제는 없을 겁니다.</p>
+
+<p>제공하는 커맨드는 다음과 같습니다.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">GHDashboard[!] [user]</code>
+    <ul>
+      <li>특정 유저의 dashboard 화면</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">GHActivity[!] [user|repo]</code>
+    <ul>
+      <li>특정 유저 혹은 repository 의 활동 내역</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Public GitHub 의 경우 조회만 하는 경우는 인증이 필요 없기 때문에 느낌표를 붙여서 실행하시면 되겠습니다.</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">:</span>GHD<span class="p">!</span> junegunn
+</code></pre></div></div>
+
+<p><img src="/files/vim-ghd-2.png" alt="GHD 명령으로 사용자의 대시보드 보기" /></p>
+
+<p><code class="highlighter-rouge">CTRL-N</code> / <code class="highlighter-rouge">CTRL-P</code> 로 링크 사이를 이동할 수 있고, <code class="highlighter-rouge">Enter</code> key 나 <code class="highlighter-rouge">o</code>를 누르면 해당 페이지가 브라우저에서 열립니다.</p>
+
+<p>매번 본인의 ID 를 입력하는 것이 번거롭다면 다음과 같은 설정을 vimrc 에 추가하세요.</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="nv">g:github_dashboard</span> <span class="p">=</span> <span class="p">{</span> <span class="s1">'username'</span><span class="p">:</span> <span class="s1">'junegunn'</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>GHA 커맨드도 마찬가지 방식으로 사용합니다.</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">:</span>GHA<span class="p">!</span> torvalds
+</code></pre></div></div>
+
+<p><img src="/files/vim-ghd-3.png" alt="GHA 명령으로 torvalds의 활동 보기" /></p>
+
+<p><a href="https://github.com/torvalds">Linus</a> 선생님이 무얼하며 지내시는지 볼 수도 있고요,</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">:</span>GHA<span class="p">!</span> torvalds/linux
+</code></pre></div></div>
+
+<p><img src="/files/vim-ghd-4.png" alt="GHA 명령으로 linux 프로젝트의 활동 보기" /></p>
+
+<p><a href="https://github.com/torvalds/linux">Linux</a>에 무슨 일들이 벌어지고 있는지도 간단히 확인할 수 있습니다.</p>
+
+<p>사내에서 사용하는 <a href="https://enterprise.github.com">GitHub Enterprise</a>에 접근하려면 프로파일을 지정해야 하는데요. <code class="highlighter-rouge">g:github_dashboard#프로파일명</code> 의 변수를 선언하면 <code class="highlighter-rouge">GHD -프로파일명</code> 과 같은 형태로 사용하실 수 있습니다.</p>
+
+<p>다음과 같은 식으로 <code class="highlighter-rouge">foo</code> 프로파일을 정의하면 됩니다.</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="nv">g:github_dashboard</span>#foo <span class="p">=</span> <span class="p">{</span>
+<span class="se">  \</span> <span class="s1">'username'</span><span class="p">:</span>     <span class="s1">'your-github-enterprise-username'</span><span class="p">,</span>
+<span class="se">  \</span> <span class="s1">'password'</span><span class="p">:</span>     ACCESS_TOKEN<span class="p">,</span>
+<span class="se">  \</span> <span class="s1">'api_endpoint'</span><span class="p">:</span> <span class="s1">'https://your-github-enterprise-host-name/api/v3'</span><span class="p">,</span>
+<span class="se">  \</span> <span class="s1">'web_endpoint'</span><span class="p">:</span> <span class="s1">'https://your-github-enterprise-host-name'</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>(Access token 은 https://your-github-enterprise-host-name/settings/applications 에서 발급 가능)</p>
+
+<p>이제 <code class="highlighter-rouge">foo</code> 프로파일을 사용하여 <code class="highlighter-rouge">bar</code> 사용자의 <code class="highlighter-rouge">baz</code> 프로젝트에서는 무슨 일이 벌어지고 있나 보려면 다음과 같이 하시면 됩니다. 인증이 필요하므로 <code class="highlighter-rouge">!</code> 이 없는 커맨드를 실행합니다.</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">:</span>GHA <span class="p">-</span>foo bar/baz
+</code></pre></div></div>
+
+<p>멀쩡한 브라우저 놔두고 왜 vim에서 이런 짓(?)을 하냐는 최초의 질문에 대한 답변은 Emacs 아저씨의 <a href="https://stallman.org/articles/on-hacking.html">말씀</a>으로 대신하도록 하죠.</p>
+
+<blockquote>
+  <p>Playfully doing something difficult,
+whether useful or not,
+that is hacking.</p>
+</blockquote>
+
+<p>그래도 굳이 사용해야 할 이유를 찾아 보자면, 내가 아닌 다른 사람의 대시보드 화면이나 특정 저장소의 활동 정보를 목록으로 볼 수 있는 페이지가 GitHub 에 없기 때문에 그런 용도로 사용해 보실 수는 있겠습니다.</p>
+
+<blockquote>
+  <p>이 글은 <a href="http://rankedin.kr">ranked.in</a> 선정 <a href="http://rankedin.kr/users">한국 개발자 인기 1위</a>, <a href="http://rankedin.kr/repos">한국 저장소 인기 1위</a> 2관왕에 빛나는 “빔신” <a href="http://junegunn.kr">jg.choi</a>가 사내 게시판에 올린 글을 저자의 동의를 얻어 옮긴 것입니다. <a href="https://github.com/junegunn">저자의 깃헙</a>을 방문하시면 다양한 vim 플러그인과 유틸리티들, 그리고 <a href="https://github.com/junegunn/dotfiles/blob/master/vimrc">빔신의 vimrc</a>를 보실 수 있습니다.</p>
+</blockquote>
+
+<ul>
+  <li>커버 이미지 출처: <a href="https://flic.kr/p/9wA9A5">deciphering your dashboard (365-96)</a> © <a href="https://www.flickr.com/photos/29233640@N07/">Robert Couse-Baker</a></li>
+</ul>
+</div>
+  <div id="post-footer">
+    
+    <a id="post-author" href="/authors/jg.choi/">
+      <div id="author-image" style="background-image:url(/files/authors/jg.choi.jpg);">
+        <span class="sr-only">jg.choi's profile image</span>
+      </div>
+      <p id="author-name">jg.choi</p>
+    </a>
+    <p id="post-date">2016-03-03 10:45</p>
+    <a id="post-more" href="/authors/jg.choi/">
+      <span>Read more posts by this author</span>
+    </a>
+  </div>
+</div>
+
+<div class="container" style="margin-top:25px; padding:0px">
+  <a href="https://www.welcomekakao.com" target="_blank"><img src="/files/career2020.jpg" style="width:100%;"></a>
+</div>
+
+<div id="post-links" class="container">
+  
+  
+  <div id="post-prev" style="background-image: url(/files/covers/traffic.jpg);" >
+    <div>
+      <h3><a href="/2016/02/16/opensource-2-mtre/">kakao의 오픈소스 Ep2 - MRTE(MySQL Realtime Traffic Emulator)</a></h3>
+      <p>YOU MIGHT ENJOY</p>
+    </div>
+  </div>
+  
+  
+  
+  <div id="post-next" style="background-image: url(/files/covers/monad.jpg);" >
+    <div>
+      <h3><a href="/2016/03/03/monad-programming-with-scala-future/">Monad Programming with Scala Future</a></h3>
+      <p>NEXT POST</p>
+    </div>
+  </div>
+  
+</div>
+
+<div id="lightbox">
+  <div id="lightbox-image"></div>
+</div>
+
+    <div class="clearfix"></div>
+
+    <a href="#" id="back-to-top"></a>
+</div>
+
+<div id="footer" class="container-fluid">
+    <ul id="links">
+        
+        <li>
+            <a id="link-github" href="http://github.com/kakao" target="_blank">
+                <span class="sr-only">github</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-facebook" href="http://facebook.com/nkakao" target="_blank">
+                <span class="sr-only">facebook</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-twitter" href="http://twitter.com/kakaodev" target="_blank">
+                <span class="sr-only">twitter</span>
+            </a>
+        </li>
+        
+        <li>
+            <a id="link-rss" href="/rss" target="_blank">
+                <span class="sr-only">rss</span>
+            </a>
+        </li>
+    </ul>
+    <ul id="footer-menu">
+        <li><a href="//www.kakaocorp.com">Kakao</a></li>
+        <li><a href="//careers.kakao.com/jobs">Jobs</a></li>
+        <li><a href="//privacy.kakaocorp.com">Privacy</a></li>
+    </ul>
+    <p id="copyright">
+        <a href="//www.kakaocorp.com">Copyright &copy; Kakao Corp.</a>
+        All rights reserved.
+    </p>
+</div><!--#footer-->
+
+
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-72007721-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+
+    <script type='text/javascript'>
+   //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    //Kakao.init('65d48e116d8b9409e08960c4800c3017');
+    function shareStory(abs_page_url) {
+        Kakao.Story.share({
+            url: abs_page_url,
+            text: '카카오 기술블로그 #개발자 #카카오'
+        });
+    }
+    //]]>
+</script>
+
+    
+    <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1204347326263800',
+    xfbml      : true,
+    version    : 'v2.7'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+    
+
+    
+    <script>!function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    }(document, 'script', 'twitter-wjs');
+</script>
+
+    
+
+    
+    <script src="https://apis.google.com/js/platform.js" async defer>
+    {
+        lang: 'ko'
+    }
+</script>
+
+    
+
+</body>
+</html>

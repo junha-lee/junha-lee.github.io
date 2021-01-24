@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+
+
+<title>kakao 기술 블로그</title>
+<meta name="title" content="kakao 기술 블로그" />
+<meta name="author" content="opensource@kakaocorp.com"/>
+<meta name="description" content="Connect Everything 새로운 연결, 새로운 세상.
+연결의 혁신으로 세상은 더욱 가깝고 새로워진다고 카카오는 믿습니다.
+"/>
+
+<meta property="fb:app_id" content="1204347326263800"/>
+
+<meta property="og:site_name" content="kakao 기술 블로그"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="kakao 기술 블로그"/>
+<meta property="og:description" content="Connect Everything 새로운 연결, 새로운 세상.
+연결의 혁신으로 세상은 더욱 가깝고 새로워진다고 카카오는 믿습니다.
+"/>
+<meta property="og:url" content="http://localhost:4000"/>
+<meta property="og:image" content="http://localhost:4000/assets/images/default_blog_cover.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="kakao 기술 블로그"/>
+<meta name="twitter:description" content="Connect Everything 새로운 연결, 새로운 세상.
+연결의 혁신으로 세상은 더욱 가깝고 새로워진다고 카카오는 믿습니다.
+"/>
+<meta name="twitter:label1" content="Written by"/>
+<meta name="twitter:data1" content="opensource@kakaocorp.com"/>
+<meta name="twitter:image:src" content="http://localhost:4000/assets/images/default_blog_cover.jpg"/>
+
+<meta name="twitter:label2" content="Filed under"/>
+<meta name="twitter:data2" content=""/>
+
+
+
+<meta property="article:published_time" content="2021-01-25T00:53:38+09:00"/>
+
+
+<link href="http://localhost:4000/rss/" rel="alternate" type="application/rss+xml" title="RSS"/>
+<link href="/assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" type="image/png"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon-precomposed" type="image/png"/>
+<link href="/assets/lib/normalize.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/css/monokai.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/lib/magnific-popup.min.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/fonts/Kakao.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/css/screen.css" rel="stylesheet" type="text/css"/>
+<script>
+    if (window.location.host.indexOf('tech.kakao.com') > -1 && window.location.protocol == "https:"){
+        window.location = window.location.toString().replace(/^https:/, "http:");
+    }
+</script>
+
+</head>
+<body class="tag-template">
+
+<div id="header">
+    <button id="menu-toggle" type="button">
+        <span class="sr-only">Toggle Navigation Menu</span>
+    </button>
+    <button id="search-toggle" type="button">
+        <span class="sr-only">Toggle Search Form</span>
+    </button>
+    <a id="logo" href="/">
+        <span class="sr-only">KakaoTech</span>
+    </a>
+    <div id="search">
+        <input id="search-input" type="search" placeholder="Search..." value="" />
+    </div>
+    <ul class="search__results" id="results-container"></ul>
+
+    <ul id="menu" class="nav">
+        <li class=" active "><a href="/">블로그</a></li>
+        <li class=""><a href="/opensource/">오픈소스</a></li>
+        <li class=""><a href="/openapi/">오픈API</a></li>
+        <li class=""><a href="/events/">기술행사</a></li>
+    </ul>
+</div>
+<!-- Script pointing to jekyll-search.js -->
+<script src="/dest/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '/search2.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: '<li>No results found</li>',
+        limit: 15,
+        fuzzy: false,
+        exclude: ['Welcome']
+    })
+</script><!-- #header -->
+
+
+
+<div id="wrapper">
+    <div id="navbar" class="container">
+    <h5><a id="link-back" href="/">Main</a></h5>
+    
+<ul id="shares">
+    <li class="stalk" style="display:none">
+        <a id="kakao-link-btn" href="javascript:;"></a>
+    </li>
+    <li>
+        <a id="share-kakaostory" href="javascript:shareStory('http://localhost:4000/tags/programming-contest/');"></a>
+    </li>
+
+    
+    <li>
+        <a id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/tags/programming-contest/"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="sr-only">Share to Facebook</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-twitter"
+           href="https://twitter.com/intent/tweet?text=%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%20%EB%8C%80%ED%9A%8C&url=http://localhost:4000/tags/programming-contest/">
+            <span class="sr-only">Share to Twitter</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-google" href="https://plus.google.com/share?url=http://localhost:4000/tags/programming-contest/"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+            <span class="sr-only">Share to Google+</span>
+        </a>
+    </li>
+    
+</ul>
+
+</div>
+
+<div id="cover" class="container"
+     >
+    <div>
+        <h1>프로그래밍 대회</h1>
+        <p>All Posts in <strong>programming-contest</strong></p>
+    </div>
+</div>
+
+<div id="content" class="container">
+    <div id="tag-content" role="main">
+        <ul id="post-list">
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+                    <li class="post-item post ">
+    <a href="/2018/09/12/code-festival-2018-round-2/">
+        <h3 class="post-title">코드 페스티벌 2018 본선 이야기</h3>
+        <p class="post-excerpt">2018 코드 페스티벌, 뜨거운 열기와 함께 본선 시작! 지난 8월 25일 토요일, 카카오 코드 페스티벌 오프라인 본선이 진행됐습니다. 예선에서의 엄청난 경쟁률을 뚫고 당당히 본선에 진출한 64명의 실력자들이 함께 했는데요. 작년과는 다르게 카카오 판교 오피스에서 행사를 개최하여 더 뜻깊은 자리가 되었던 것 같습니다. ▶ 행사 후기가 궁금하시다면? 그럼 본선에 출제되었던 문제와 해법을 알아보도록 하겠습니다. 문제 설명 및 풀이 승부 예측 제출자 62명 정답자 62명 문제 풀러 가기 서로 다른 결과의 경우의 수가 총 36 가지임을 알...</p>
+    </a>
+    <p class="post-tags">
+        
+            <a href="/tags/code-festival" title="code-festival"
+               class="tag tag-code-festival">code-festival</a>
+        
+            <a href="/tags/programming-contest" title="programming-contest"
+               class="tag tag-programming-contest">programming-contest</a>
+        
+            <a href="/tags/coding" title="coding"
+               class="tag tag-coding">coding</a>
+        
+    </p>
+    <div class="post-meta">
+        
+        <a href="/authors/lance.moon">
+            <div class="author-image"
+                 style="background-image:url(/files/authors/lance.moon.jpg);">
+                <span class="sr-only">lance.moon's profile image</span>
+            </div>
+            <p class="author-name">lance.moon</p>
+        </a>
+        <p class="post-date">2018-09-12 17:00</p>
+    </div>
+    <!--<div class="clearfix"></div>-->
+</li>
+
+                
+            
+                
+            
+                
+                    <li class="post-item post ">
+    <a href="/2018/08/09/code-festival-2018-round-1/">
+        <h3 class="post-title">코드 페스티벌 2018 예선전 이야기</h3>
+        <p class="post-excerpt">카카오 코드 페스티벌 예선전, 많은 관심 감사합니다! 작년에 이어 두 번째로 진행된 카카오 코드 페스티벌, 온라인 예선이 지난 8월 4일 토요일에 진행됐습니다. 작년보다 더욱 많은 6,000여 명의 참가자들이 6시간 동안 뜨거운 열정을 발휘했는데요, 특히 실시간으로 바뀌는 스코어보드를 보면서 치열한 접전을 느낄 수 있었습니다. 여기 예선 문제와 해설, 그리고 결과를 공유합니다. 참가해주신 모든 모든 분들께 감사드립니다! 문제 설명 및 풀이 상금 헌터 제출자 3120명 정답자 2686명 문제 풀러 가기 대회에 참가해서 얼마의 상금을 받을 수 있을지를...</p>
+    </a>
+    <p class="post-tags">
+        
+            <a href="/tags/code-festival" title="code-festival"
+               class="tag tag-code-festival">code-festival</a>
+        
+            <a href="/tags/programming-contest" title="programming-contest"
+               class="tag tag-programming-contest">programming-contest</a>
+        
+            <a href="/tags/coding" title="coding"
+               class="tag tag-coding">coding</a>
+        
+    </p>
+    <div class="post-meta">
+        
+        <a href="/authors/bryan.j">
+            <div class="author-image"
+                 style="background-image:url(/files/authors/bryan.j.jpg);">
+                <span class="sr-only">bryan.j's profile image</span>
+            </div>
+            <p class="author-name">bryan.j</p>
+        </a>
+        <p class="post-date">2018-08-09 17:00</p>
+    </div>
+    <!--<div class="clearfix"></div>-->
+</li>
+
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+                    <li class="post-item post ">
+    <a href="/2017/09/14/code-festival-round-2/">
+        <h3 class="post-title">카카오 코드 페스티벌 본선 이야기</h3>
+        <p class="post-excerpt">드디어 본선의 막이 열렸습니다! 지난 9월 9일 토요일, 카카오 코드 페스티벌의 오프라인 본선이 진행됐습니다. 예선에서의 엄청난 경쟁률을 뚫고 당당히 본선에 진출한 100여명의 실력자들이 함께 했는데요. 합병 후 카카오의 첫 개발자 행사인 만큼, 처음이라는 설렘을 담아 구석구석 정성스러움을 가득 담아 대회를 준비했습니다. ▶ 행사 후기가 궁금하시다면? 코드 페스티벌의 핵심인 문제도 정말 열심히 준비했습니다! 참가자들도 “문제 모티브가 재미있어 다른 대회보다 더 즐기는 마음으로 참여할 수 있었다”는 긍정적인 피드백을 주셨는데요, (이런 피드백 무한 감사, 정말 힘이 납니다!) 본선에...</p>
+    </a>
+    <p class="post-tags">
+        
+            <a href="/tags/code-festival" title="code-festival"
+               class="tag tag-code-festival">code-festival</a>
+        
+            <a href="/tags/programming-contest" title="programming-contest"
+               class="tag tag-programming-contest">programming-contest</a>
+        
+            <a href="/tags/coding" title="coding"
+               class="tag tag-coding">coding</a>
+        
+    </p>
+    <div class="post-meta">
+        
+        <a href="/authors/bryan.j">
+            <div class="author-image"
+                 style="background-image:url(/files/authors/bryan.j.jpg);">
+                <span class="sr-only">bryan.j's profile image</span>
+            </div>
+            <p class="author-name">bryan.j</p>
+        </a>
+        <p class="post-date">2017-09-14 08:00</p>
+    </div>
+    <!--<div class="clearfix"></div>-->
+</li>
+
+                
+            
+                
+            
+                
+            
+                
+                    <li class="post-item post ">
+    <a href="/2017/08/11/code-festival-round-1/">
+        <h3 class="post-title">카카오 코드 페스티벌 예선전 이야기</h3>
+        <p class="post-excerpt">함께 축제를 즐겨주신 모든 분들께 감사드립니다! 지난 8월 5일 토요일, 카카오 코드 페스티벌의 온라인 예선이 개최되었습니다. 합병 후 카카오라는 이름으로 처음 열리는 개발자 행사인 만큼, 여러 카카오 크루들이 긴장되지만 신나는 마음으로 대회를 준비했습니다. 이번 예선전에는 총 6개의 문제가 출제되었습니다. 다양한 난이도의 문제를 출제하여 최대한 많은 참가자들이 즐길 수 있도록 하는 데 초점을 맞췄습니다. 출제진이 생각했던 것보다 빠르게 문제를 풀어나가는 참가자를 보면서 뛰어난 실력에 감탄했고, 여러 번 제출했지만 정답 판정을 받지 못하는 분들을 보며 안타까움을 느꼈습니다....</p>
+    </a>
+    <p class="post-tags">
+        
+            <a href="/tags/code-festival" title="code-festival"
+               class="tag tag-code-festival">code-festival</a>
+        
+            <a href="/tags/programming-contest" title="programming-contest"
+               class="tag tag-programming-contest">programming-contest</a>
+        
+            <a href="/tags/coding" title="coding"
+               class="tag tag-coding">coding</a>
+        
+    </p>
+    <div class="post-meta">
+        
+        <a href="/authors/bryan.j">
+            <div class="author-image"
+                 style="background-image:url(/files/authors/bryan.j.jpg);">
+                <span class="sr-only">bryan.j's profile image</span>
+            </div>
+            <p class="author-name">bryan.j</p>
+        </a>
+        <p class="post-date">2017-08-11 18:00</p>
+    </div>
+    <!--<div class="clearfix"></div>-->
+</li>
+
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+        </ul>
+        <ul id="pagination" role="navigation">
+    
+</ul>
+
+    </div>
+</div>
+
+
+    <div class="clearfix"></div>
+
+    <a href="#" id="back-to-top"></a>
+</div>
+
+<div id="footer" class="container-fluid">
+    <ul id="links">
+        
+        <li>
+            <a id="link-github" href="http://github.com/kakao" target="_blank">
+                <span class="sr-only">github</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-facebook" href="http://facebook.com/nkakao" target="_blank">
+                <span class="sr-only">facebook</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-twitter" href="http://twitter.com/kakaodev" target="_blank">
+                <span class="sr-only">twitter</span>
+            </a>
+        </li>
+        
+        <li>
+            <a id="link-rss" href="/rss" target="_blank">
+                <span class="sr-only">rss</span>
+            </a>
+        </li>
+    </ul>
+    <ul id="footer-menu">
+        <li><a href="//www.kakaocorp.com">Kakao</a></li>
+        <li><a href="//careers.kakao.com/jobs">Jobs</a></li>
+        <li><a href="//privacy.kakaocorp.com">Privacy</a></li>
+    </ul>
+    <p id="copyright">
+        <a href="//www.kakaocorp.com">Copyright &copy; Kakao Corp.</a>
+        All rights reserved.
+    </p>
+</div><!--#footer-->
+
+
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-72007721-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+
+    <script type='text/javascript'>
+   //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    //Kakao.init('65d48e116d8b9409e08960c4800c3017');
+    function shareStory(abs_page_url) {
+        Kakao.Story.share({
+            url: abs_page_url,
+            text: '카카오 기술블로그 #개발자 #카카오'
+        });
+    }
+    //]]>
+</script>
+
+    
+    <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1204347326263800',
+    xfbml      : true,
+    version    : 'v2.7'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+    
+
+    
+    <script>!function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    }(document, 'script', 'twitter-wjs');
+</script>
+
+    
+
+    
+    <script src="https://apis.google.com/js/platform.js" async defer>
+    {
+        lang: 'ko'
+    }
+</script>
+
+    
+
+</body>
+</html>

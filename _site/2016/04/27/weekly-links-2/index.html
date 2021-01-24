@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+
+
+<title>Weekly Links #2 - 2016년 4월 넷째주</title>
+<meta name="title" content="Weekly Links #2 - 2016년 4월 넷째주" />
+<meta name="author" content="iolo.fitzowen"/>
+<meta name="description" content="Weekly Links에서는 지난 한 주, 카카오의 기술 블로그 담당자가 구독하는 기술 뉴스레터들에서 “인간의 눈”으로 선별한 링크들을 짧은 코멘트와 함께 공유합니다. 포함된 뉴스레터 목록은 awesome-tech-newsletters에서 확인하실 수 있습니다. 2016년 4월 넷째주 추천 링크 Node.js v6 출시 V8엔진을 5.0으로 업데이트해서 ES6 문법의 93%를 지원한다는 군요. v5와 v6로의 변경사항이 꽤 길지만, 눈에 띄는 것은 없습니다. 물론 기존 v4은 2017년 4월까지 계속 지원(LTS; Long Term Support). 윈도10 속 우분투 배시 링크는 지디넷의 요약 기사구요, 영어 원문은 매우 길기 때문에…..."/>
+
+<meta property="fb:app_id" content="1204347326263800"/>
+
+<meta property="og:site_name" content="kakao 기술 블로그"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="Weekly Links #2 - 2016년 4월 넷째주"/>
+<meta property="og:description" content="Weekly Links에서는 지난 한 주, 카카오의 기술 블로그 담당자가 구독하는 기술 뉴스레터들에서 “인간의 눈”으로 선별한 링크들을 짧은 코멘트와 함께 공유합니다. 포함된 뉴스레터 목록은 awesome-tech-newsletters에서 확인하실 수 있습니다. 2016년 4월 넷째주 추천 링크 Node.js v6 출시 V8엔진을 5.0으로 업데이트해서 ES6 문법의 93%를 지원한다는 군요. v5와 v6로의 변경사항이 꽤 길지만, 눈에 띄는 것은 없습니다. 물론 기존 v4은 2017년 4월까지 계속 지원(LTS; Long Term Support). 윈도10 속 우분투 배시 링크는 지디넷의 요약 기사구요, 영어 원문은 매우 길기 때문에…..."/>
+<meta property="og:url" content="http://localhost:4000/2016/04/27/weekly-links-2/"/>
+<meta property="og:image" content="http://localhost:4000/files/covers/links.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Weekly Links #2 - 2016년 4월 넷째주"/>
+<meta name="twitter:description" content="Weekly Links에서는 지난 한 주, 카카오의 기술 블로그 담당자가 구독하는 기술 뉴스레터들에서 “인간의 눈”으로 선별한 링크들을 짧은 코멘트와 함께 공유합니다. 포함된 뉴스레터 목록은 awesome-tech-newsletters에서 확인하실 수 있습니다. 2016년 4월 넷째주 추천 링크 Node.js v6 출시 V8엔진을 5.0으로 업데이트해서 ES6 문법의 93%를 지원한다는 군요. v5와 v6로의 변경사항이 꽤 길지만, 눈에 띄는 것은 없습니다. 물론 기존 v4은 2017년 4월까지 계속 지원(LTS; Long Term Support). 윈도10 속 우분투 배시 링크는 지디넷의 요약 기사구요, 영어 원문은 매우 길기 때문에…..."/>
+<meta name="twitter:label1" content="Written by"/>
+<meta name="twitter:data1" content="iolo.fitzowen"/>
+<meta name="twitter:image:src" content="http://localhost:4000/files/covers/links.jpg"/>
+
+<meta name="twitter:label2" content="Filed under"/>
+<meta name="twitter:data2" content="weekly,links"/>
+
+<meta property="article:tag" content="weekly"/>
+
+<meta property="article:tag" content="links"/>
+
+
+
+<meta property="article:published_time" content="2016-04-27T10:04:00+09:00"/>
+
+
+<meta property="article:author" content="http://localhost:4000/authors/iolo.fitzowen"/>
+
+<link href="http://localhost:4000/rss/" rel="alternate" type="application/rss+xml" title="RSS"/>
+<link href="/assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" type="image/png"/>
+<link href="/assets/apple-touch-icon.png" rel="apple-touch-icon-precomposed" type="image/png"/>
+<link href="/assets/lib/normalize.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/css/monokai.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/lib/magnific-popup.min.css" rel="stylesheet" type="text/css"/>
+<link href="/assets/fonts/Kakao.css" rel="stylesheet" type="text/css"/> 
+<link href="/assets/css/screen.css" rel="stylesheet" type="text/css"/>
+<script>
+    if (window.location.host.indexOf('tech.kakao.com') > -1 && window.location.protocol == "https:"){
+        window.location = window.location.toString().replace(/^https:/, "http:");
+    }
+</script>
+
+</head>
+<body class="post-template">
+
+<div id="header">
+    <button id="menu-toggle" type="button">
+        <span class="sr-only">Toggle Navigation Menu</span>
+    </button>
+    <button id="search-toggle" type="button">
+        <span class="sr-only">Toggle Search Form</span>
+    </button>
+    <a id="logo" href="/">
+        <span class="sr-only">KakaoTech</span>
+    </a>
+    <div id="search">
+        <input id="search-input" type="search" placeholder="Search..." value="" />
+    </div>
+    <ul class="search__results" id="results-container"></ul>
+
+    <ul id="menu" class="nav">
+        <li class=" active "><a href="/">블로그</a></li>
+        <li class=""><a href="/opensource/">오픈소스</a></li>
+        <li class=""><a href="/openapi/">오픈API</a></li>
+        <li class=""><a href="/events/">기술행사</a></li>
+    </ul>
+</div>
+<!-- Script pointing to jekyll-search.js -->
+<script src="/dest/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '/search2.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: '<li>No results found</li>',
+        limit: 15,
+        fuzzy: false,
+        exclude: ['Welcome']
+    })
+</script><!-- #header -->
+
+
+
+<div id="wrapper">
+    <div id="navbar" class="container">
+  <h5><a id="link-back" href="/">Back to Posts</a></h5>
+  
+<ul id="shares">
+    <li class="stalk" style="display:none">
+        <a id="kakao-link-btn" href="javascript:;"></a>
+    </li>
+    <li>
+        <a id="share-kakaostory" href="javascript:shareStory('http://localhost:4000/2016/04/27/weekly-links-2/');"></a>
+    </li>
+
+    
+    <li>
+        <a id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/2016/04/27/weekly-links-2/"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="sr-only">Share to Facebook</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-twitter"
+           href="https://twitter.com/intent/tweet?text=Weekly%20Links%20#2%20-%202016%EB%85%84%204%EC%9B%94%20%EB%84%B7%EC%A7%B8%EC%A3%BC&url=http://localhost:4000/2016/04/27/weekly-links-2/">
+            <span class="sr-only">Share to Twitter</span>
+        </a>
+    </li>
+    
+    
+    <li>
+        <a id="share-google" href="https://plus.google.com/share?url=http://localhost:4000/2016/04/27/weekly-links-2/"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+            <span class="sr-only">Share to Google+</span>
+        </a>
+    </li>
+    
+</ul>
+
+</div>
+
+<div id="cover" class="container" style="background-image: url(/files/covers/links.jpg);" >
+  <div>
+    <h1>Weekly Links #2 - 2016년 4월 넷째주</h1>
+    <p>
+      
+      <a href="/tags/weekly">weekly</a>
+      ,
+      
+      <a href="/tags/links">links</a>
+      
+      
+    </p>
+    
+
+
+  </div>
+</div>
+
+<div id="content" class="container post" role="main">
+  <div id="post-content"><p><strong><a href="http://tech.kakao.com/tags/weekly/">Weekly Links</a></strong>에서는 지난 한 주, 카카오의 기술 블로그 담당자가 구독하는 기술 뉴스레터들에서 “인간의 눈”으로 선별한 링크들을 짧은 코멘트와 함께 공유합니다.</p>
+
+<blockquote>
+  <p>포함된 뉴스레터 목록은 <a href="https://github.com/kakao/awesome-tech-newletters">awesome-tech-newsletters</a>에서 확인하실 수 있습니다.</p>
+</blockquote>
+
+<h2 id="2016년-4월-넷째주-추천-링크">2016년 4월 넷째주 추천 링크</h2>
+
+<h4 id="nodejs-v6-출시"><a href="https://nodejs.org/en/blog/release/v6.0.0/">Node.js v6 출시</a></h4>
+
+<p><a href="https://developers.google.com/v8/">V8</a>엔진을 5.0으로 업데이트해서 <a href="http://node.green/">ES6 문법의 93%를 지원</a>한다는 군요. <a href="https://github.com/nodejs/node/wiki/Breaking-changes-between-v5-and-v6">v5와 v6로의 변경사항</a>이 꽤 길지만, 눈에 띄는 것은 없습니다. 물론 기존 v4은 2017년 4월까지 계속 지원(LTS; Long Term Support).</p>
+
+<p><img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwHaq4FJCveCBKCNZV-bZscw_/89caada5a1ddde2795b892cae089b4da1667fc7b08261b4c493670baa83d5cb9" class="pull-right" /></p>
+<h4 id="윈도10-속-우분투-배시"><a href="http://www.zdnet.co.kr/news/news_view.asp?artice_id=20160425093205">윈도10 속 우분투 배시</a></h4>
+
+<p>링크는 지디넷의 요약 기사구요, 영어 <a href="https://blogs.msdn.microsoft.com/wsl/2016/04/22/windows-subsystem-for-linux-overview/">원문</a>은 매우 길기 때문에… 꼭 보실 분 만 보세요. 리스닝에 자신 있으시면 <a href="https://channel9.msdn.com/Blogs/Seth-Juarez/Windows-Subsystem-for-Linux-Architectural-Overview">동영상</a>도 있습니다.</p>
+
+<p>요약하면, 리눅스에서 <a href="https://www.winehq.org">WINE</a>이 하는 짓(?)과 비슷한 짓(!)을 한다~입니다. WINE은 윈도의 수많은 <a href="http://undoc.airesoft.co.uk">Undocumented API </a> 때문에 고통받았었는데 좀 불공평?!</p>
+
+<h4 id="mysql-모니터링-시리즈">MySQL 모니터링 시리즈</h4>
+<ul>
+  <li>1부. <a href="https://www.datadoghq.com/blog/monitoring-mysql-performance-metrics/">성능 메트릭</a></li>
+  <li>2부. <a href="https://www.datadoghq.com/blog/collecting-mysql-statistics-and-metrics/">수집 &amp; 통계</a></li>
+  <li>3부. <a href="https://www.datadoghq.com/blog/mysql-monitoring-with-datadog/">DataLog 광고</a></li>
+</ul>
+
+<p>결론은 광고지만, 거기까지 가는 과정에서 유익한 내용이 많습니다. 이런 광고라면 고맙죠~</p>
+
+<h4 id="개발자의-도서관-코드를-사랑하는-사람에게-보물같은-책들"><a href="https://medium.com/javascript-scene/the-software-developer-s-library-a-treasure-trove-of-books-for-people-who-love-code-f9bc92c7883b#.mv67vc9dq">개발자의 도서관: 코드를 사랑하는 사람에게 보물같은 책들</a></h4>
+
+<p><a href="http://book.daum.net/detail/book.do?bookid=BOK00000963491AL">뷰티플코드</a>, <a href="http://book.daum.net/detail/book.do?bookid=ENG9780201633610">디자인패턴</a>, <a href="http://book.daum.net/detail/book.do?bookid=ENG6100132350883">클린코드</a>, <a href="http://book.daum.net/detail/book.do?bookid=ENG9780321486813">컴파일러스</a>(드래곤북??)… 주옥같은 책들이 많습니다. 안타까운 건… 번역이 안된 책도 많고, 그나마도 절판된 책이 많다는 것…</p>
+
+<p><img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwHaq4FJCveCBKCNZV-bZscw_/2a4518420a8d564ceceb58f1ef335add1667fc7b08261b4c493670baa83d5cb9" class="pull-right" /></p>
+<h4 id="2016-전세계-소프트웨어-개발자-연봉-설문-조사-by-오라일리"><a href="https://www.oreilly.com/ideas/2016-software-development-salary-survey-report">2016 전세계 소프트웨어 개발자 연봉 설문 조사 by 오라일리</a></h4>
+
+<p>국가, (미국내)지역, 나이, 업무… 등 다양한 기준으로 결과를 보여주는데요, 미국 평균 10만불, 아시아 평균 3만불… 흠… 차이가 많이 나네… 아프리카 평균 5만불?! OTL</p>
+
+<h4 id="웹사이트가-느려지면-얼마나-많은-사용자가-포기하는가"><a href="https://plumbr.eu/blog/user-experience/performance-causing-users-abandon-site">웹사이트가 느려지면 얼마나 많은 사용자가 포기하는가?</a></h4>
+
+<p>요약하면, 2초면 3%, 4초면 6%, 32초면 34%가 포기~한다는 군요. 생각보다 오래 버틴다고 생각하는 건 저 뿐인가요?</p>
+
+<p>같은 블로그의 이전 글 <a href="https://plumbr.eu/blog/user-experience/how-fast-are-web-applications-in-2016">2016년의 웹 어플리케이션은 얼마나 빨라졌을까?</a>도 재미있네요. 2초 내에 끝내지 못하면… 당신의 웹은 하위 8.5% ㄷㄷㄷ 열심히 해야겠습니다.</p>
+<h4 id="알아두면-좋은-22가지-모바일-통계"><a href="https://www.soasta.com/blog/22-mobile-web-performance-stats/">알아두면 좋은 22가지 모바일 통계</a></h4>
+
+<p>다양한 모바일 관련 통계들을 보여주는데요, 개인적으로 가장 인상적인 통계는: <strong>2015년에 모바일 상거래가 115조 달더인데, 데스크탑 52%, 태블릿 33,% 모바일 15%</strong>!</p>
+
+<h4 id="visual-studio-code-10-출시"><a href="http://code.visualstudio.com/blogs/2016/04/14/vscode-1.0">Visual Studio Code 1.0 출시</a></h4>
+
+<p>자사의 제품인 Visual Studio에서 직접 지원하지 못하는 언어/플랫폼을 Code를 통해 지원하려는 전략일까요?  Node.js, Go, C++, PHP, Python… 점점 더 강력해지고 있습니다. 개인적으로는 시간이 지면서 느려지는 문제 때문에 당분간은 젯브레인에 머물러 있을 듯 ;)</p>
+
+<h4 id="micropython---마이크로-컨트롤러--전용-파이썬"><a href="http://www.micropython.org">MicroPython - 마이크로 컨트롤러 &amp; 전용 파이썬</a></h4>
+
+<p><strong>오픈 하드웨어 + 오픈 소프트웨어</strong> 전용 마이크로 컨트롤러는 20유료~ 정도. 뭔가 재밌는 걸 해볼 수 있을 것 같지만… 지금도 집에서 놀고 있는 아두이노와 라스베리파이와…</p>
+
+<p><img src="http://item-kr.talk.kakao.co.kr/do/-26p06+UqCd0OAgiRHNZwPf1+nqjcFZi42Z3wogPJ3I_/e72b7ae2f96032e9fd3ff7778cbe169a1667fc7b08261b4c493670baa83d5cb9" class="pull-right" /></p>
+<h4 id="swift-안드로이드-포트-풀리케가-보름만에-마스터에-머지"><a href="https://github.com/apple/swift/pull/1442">swift 안드로이드 포트 풀리케가 보름만에 마스터에 머지</a></h4>
+
+<p>요즘 한창인 프로그래밍언어 전쟁에서 swift가 거침없이 진격하고 있네요. 굴뚝에 연기가 나는 걸 보니… 누가 불을 때고 있긴 한가 본데…</p>
+
+<h4 id="kotlin-10-이후-계획"><a href="http://blog.jetbrains.com/kotlin/2016/04/kotlin-post-1-0-roadmap/">Kotlin 1.0 이후 계획</a></h4>
+
+<p><a href="https://kotlinlang.org">Kotlin</a>이 <a href="http://thenextweb.com/dd/2016/04/07/google-facebook-uber-swift/#gref">구글의 평가</a>에 자극받았는지, <a href="http://blog.jetbrains.com/kotlin/2016/03/kotlins-android-roadmap/">안드로이드 지원 계획</a>을 발표한데 이어서, 1.0 이후 계획도 발표했습니다. IMHO, 로드맵이 너무 현실적이다 못해 소박하네요.</p>
+
+<h4 id="rust--nix--더-쉬운-유닉스-시스템-프로그래밍"><a href="http://kamalmarhubi.com/blog/2016/04/13/rust-nix-easier-unix-systems-programming-3/">Rust + nix = 더 쉬운 유닉스 시스템 프로그래밍</a></h4>
+
+<p><a href="https://github.com/nix-rust/nix">nix</a>는 다양한 unix의 시스템콜을 래핑한 <a href="https://www.rust-lang.org/">rust</a> 라이브러리입니다. 개인적으로 C/C++의 대체자로 가장 유력한 후보는 rust가 아닐까 생각하고 있습니다만…. 돌 던지지 마세요!</p>
+
+<h4 id="react-native로-페이스북-f8-앱-만들기"><a href="http://makeitopen.com">React Native로 페이스북 F8 앱 만들기</a></h4>
+
+<p>페이스북이 이번 F8 컨퍼런스의 공식 앱을 <a href="http://facebook.github.io/react-native/">React Native</a>로 만들었는데, 이걸 <a href="https://github.com/fbsamples/f8app/">오픈소스로 공개</a>했고, 만든 과정까지 친절하게 정리했습니다. 예제의 수준이 놀라울 따름~</p>
+
+<p>마이크로소프트도 <a href="https://blogs.windows.com/buildingapps/2016/04/13/react-native-on-the-universal-windows-platform/">윈도에서 구동되는 React Native</a>를 공개했습니다.</p>
+
+<p>자바가 못 이룬 WORA(Write Once Run Anywhere)의 꿈이 react의 LOWA(Learn Once Write Anywhere)로 이어지는 듯…</p>
+
+<h2 id="특집-ndc-2016-발표-자료-모음">특집: <a href="https://t.co/5UFksN5a6v">NDC 2016 발표 자료 모음</a></h2>
+
+<p>넥슨의 개발자 컨퍼런스 <a href="https://ndc.nexon.com/main">NDC 2016</a>
+이 글을 쓰는 지금도 NDC가 한창인데요, <a href="https://twitter.com/KayKimTwit">김기웅</a>님께서 벌써부터 발표 자료들을 정리해주고 계십니다.
+타임라인에 올라오는 발표자료나 후기들 보고 있으니, 어떻게든 표를 구해볼껄~하는 아쉬움이…
+마지막 발표자가 무려! Effective C++의 저자 <a href="http://www.aristeia.com">Scott Meyers</a>~</p>
+
+<p>분야가 분야인지라… 고퀄의 슬라이드들이 넘쳐나고 있는데요, 제 눈에 띄는 짤 두개만 소개하면:</p>
+
+<p><a href="https://twitter.com/debuggerD/status/724772753325191168"><img src="/files/links-ndc2016-1.jpg" alt="프로그래밍 언어들의 '잘못되었을때'에 대한 특성 맵" /></a></p>
+
+<p><a href="https://twitter.com/elore/status/725133232870580224"><img src="/files/links-ndc2016-2.jpg" alt="사실은 매일매일이 도전이긴 합니다" /></a></p>
+
+<p>BTW, 카카오의 개발자 컨퍼런스는 언제 쯤?</p>
+
+<p>매주 쓸 수 있을까… 걱정은 했었지만… 시작하자마자 펑크라니… ㅠㅠ 핑계를 대자면, 지난 주에는 겨우내 준비했던 카카오의 앱들이 줄줄이 출시되면서 본업(?)으로 정신없이 바빴습니다. 그래도!! Weekly Links는 쭈욱~~ 계속되겠죠?</p>
+
+<blockquote>
+  <p>포함된 뉴스레터 목록은 <a href="https://github.com/kakao/awesome-tech-newletters">awesome-tech-newsletters</a>에서 확인하실 수 있습니다.</p>
+</blockquote>
+
+<ul>
+  <li>커버 이미지 출처: <a href="https://flic.kr/p/KjJMP">link by link…</a> © <a href="https://www.flickr.com/photos/laenulfean/">Carsten Tolkmit</a></li>
+</ul>
+</div>
+  <div id="post-footer">
+    
+    <a id="post-author" href="/authors/iolo.fitzowen/">
+      <div id="author-image" style="background-image:url(/files/authors/iolo.fitzowen.jpg);">
+        <span class="sr-only">iolo.fitzowen's profile image</span>
+      </div>
+      <p id="author-name">iolo.fitzowen</p>
+    </a>
+    <p id="post-date">2016-04-27 10:04</p>
+    <a id="post-more" href="/authors/iolo.fitzowen/">
+      <span>Read more posts by this author</span>
+    </a>
+  </div>
+</div>
+
+<div class="container" style="margin-top:25px; padding:0px">
+  <a href="https://www.welcomekakao.com" target="_blank"><img src="/files/career2020.jpg" style="width:100%;"></a>
+</div>
+
+<div id="post-links" class="container">
+  
+  
+  <div id="post-prev" style="background-image: url(/files/covers/plug-socket.jpg);" >
+    <div>
+      <h3><a href="/2016/04/21/closewait-timewait/">CLOSE_WAIT & TIME_WAIT 최종 분석</a></h3>
+      <p>YOU MIGHT ENJOY</p>
+    </div>
+  </div>
+  
+  
+  
+  <div id="post-next" style="background-image: url(/files/covers/rubix-cube.jpg);" >
+    <div>
+      <h3><a href="/2016/04/27/rubics/">루빅스(RUBICS) - kakao의 실시간 추천 시스템</a></h3>
+      <p>NEXT POST</p>
+    </div>
+  </div>
+  
+</div>
+
+<div id="lightbox">
+  <div id="lightbox-image"></div>
+</div>
+
+    <div class="clearfix"></div>
+
+    <a href="#" id="back-to-top"></a>
+</div>
+
+<div id="footer" class="container-fluid">
+    <ul id="links">
+        
+        <li>
+            <a id="link-github" href="http://github.com/kakao" target="_blank">
+                <span class="sr-only">github</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-facebook" href="http://facebook.com/nkakao" target="_blank">
+                <span class="sr-only">facebook</span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a id="link-twitter" href="http://twitter.com/kakaodev" target="_blank">
+                <span class="sr-only">twitter</span>
+            </a>
+        </li>
+        
+        <li>
+            <a id="link-rss" href="/rss" target="_blank">
+                <span class="sr-only">rss</span>
+            </a>
+        </li>
+    </ul>
+    <ul id="footer-menu">
+        <li><a href="//www.kakaocorp.com">Kakao</a></li>
+        <li><a href="//careers.kakao.com/jobs">Jobs</a></li>
+        <li><a href="//privacy.kakaocorp.com">Privacy</a></li>
+    </ul>
+    <p id="copyright">
+        <a href="//www.kakaocorp.com">Copyright &copy; Kakao Corp.</a>
+        All rights reserved.
+    </p>
+</div><!--#footer-->
+
+
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-72007721-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+
+    <script type='text/javascript'>
+   //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    //Kakao.init('65d48e116d8b9409e08960c4800c3017');
+    function shareStory(abs_page_url) {
+        Kakao.Story.share({
+            url: abs_page_url,
+            text: '카카오 기술블로그 #개발자 #카카오'
+        });
+    }
+    //]]>
+</script>
+
+    
+    <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1204347326263800',
+    xfbml      : true,
+    version    : 'v2.7'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+    
+
+    
+    <script>!function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = p + '://platform.twitter.com/widgets.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    }(document, 'script', 'twitter-wjs');
+</script>
+
+    
+
+    
+    <script src="https://apis.google.com/js/platform.js" async defer>
+    {
+        lang: 'ko'
+    }
+</script>
+
+    
+
+</body>
+</html>
