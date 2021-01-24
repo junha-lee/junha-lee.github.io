@@ -16,12 +16,12 @@ minimal_mistakes_skin    : "default" #"neon", "air", "aqua", "contrast", "dirt",
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Ohjinjin's DevLog****"
+title                    : "Jun_pace"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
-name                     : "Ohjinjin"
-description              : "Ohjinjin's DevLog."
-url                      : "https://ohjinjin.github.io"# the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
+name                     : "Junha"
+description              : "Junha's DevLog."
+url                      : "https://junha-lee.github.io"# the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : ""# the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
@@ -108,7 +108,7 @@ analytics:
 # Site Author
 author:
   name             : "JUNHA"
-  avatar           : "/assets/images/ohjinjin.JPG"
+  avatar           : "/assets/images/junha.JPG"
   bio              : "I am an **amazing** person."
   location         : "SoonCheonHyang Univ."
   email            : "junha4304@gmail.com"
@@ -118,7 +118,7 @@ author:
       url: mailto:junha4304@gmail.com
     - label: "Website"
       icon: "fas fa-fw fa-link"
-      url: "github.io.ohjinjin"
+      url: "github.io.junha-lee"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
       # url: "https://twitter.com/"
