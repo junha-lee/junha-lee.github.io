@@ -25,7 +25,7 @@ toc: true
 
 ## Career & Activities
 ---
-IoI (AI Club) student                      *2020 - Present<br/><br/>
+IoI (AI Club) student                      *2020 - Present<br/>
 • translate ‘Hands on machine learning<br/>
 • data analysis in ‘Kaggle’<br/>
 • Get certified ‘Tensorflow Developer Certificate’<br/><br/>
