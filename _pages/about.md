@@ -25,17 +25,13 @@ toc: true
 
 ## Career & Activities
 ---
-*<pre>IoI (AI Club)</pre><br/>
-*Role: head <pre>student 2020 - Present</pre><br/>
-*• translate ‘Hands on machine learning<br/>
-*• data analysis in ‘Kaggle’<br/>
-*• Get certified ‘Tensorflow Developer Certificate’<br/>
-*<pre>Student council of the MEDIALABS College</pre><br/>
-*Role: vice <pre>president 2019</pre><br/>
-*<pre>Student council of the IoT department</pre><br/>
-*Role: student <pre>president 2018</pre><br/>
-*<pre>IoT Network Lab</pre><br/>
-*Role: research <pre>student 2017 – Present</pre><br/>
+### IoI (AI Club) student *2020 - Present<br/>
+• translate ‘Hands on machine learning<br/>
+• data analysis in ‘Kaggle’<br/>
+• Get certified ‘Tensorflow Developer Certificate’<br/>
+### Student council of the MEDIALABS College  *president 2019<br/>
+### Student council of the IoT departmen *president 2018<br/>
+### IoT Network Lab *student 2017 – Present<br/>
 
 
 ## Contact
