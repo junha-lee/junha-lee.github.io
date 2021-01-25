@@ -25,14 +25,14 @@ toc: true
 
 ## Career & Activities
 ---
-IoI (AI Club) student                      2020 - Present<br/>
+* <pre>2020 - Present</pre> IoI (AI Club) student<br/>
 > translate ‘Hands on machine learning<br/>
 > data analysis in ‘Kaggle’<br/>
 > Get certified ‘Tensorflow Developer Certificate’<br/>
 
-Student council of the MEDIALABS College   2019<br/>
-Student council of the IoT departmen       2018<br/>
-IoT Network Lab student         2017 – Present<br/>
+* <pre>2019</pre> Student council of the MEDIALABS College<br/>
+* <pre>2018</pre> Student council of the IoT departmen<br/>
+* <pre>2017 - Present</pre> IoT Network Lab student<br/>
 
 
 ## Contact
