@@ -113,9 +113,7 @@ author:
   location         : "SoonCheonHyang Univ."
   email            : "junha4304@gmail.com"
   links:
-    - label: "Email"
-      icon: "fas fa-fw fa-envelope-square"
-      url: mailto:junha4304@gmail.com
+
     - label: "Website"
       icon: "fas fa-fw fa-link"
       url: "github.io.junha-lee"
