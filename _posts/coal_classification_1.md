@@ -1,5 +1,5 @@
 ---
-title: "APMSETUP MySQL encoding Korean "
+title: "fgdfgd"
 categories: 
   - database
 last_modified_at: 2020-02-18T15:40:00+09:00
