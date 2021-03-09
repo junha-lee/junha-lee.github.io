@@ -1,3 +1,10 @@
+---
+title: "APMSETUP MySQL encoding Korean "
+categories: 
+  - database
+last_modified_at: 2020-02-18T15:40:00+09:00
+toc: true
+---
 ```python
 import os
 train_dir = './input/dataset1/train'
