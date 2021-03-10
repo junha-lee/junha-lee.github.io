@@ -65,8 +65,8 @@ plt.show()
 ```
 
 
-    
-![png](../assets/images/coal_classification_1_files/coal_classification_1_3_0.png)
+
+![coal_classification_1_3_0](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_1_files/coal_classification_1_3_0.png)
     
 
 
