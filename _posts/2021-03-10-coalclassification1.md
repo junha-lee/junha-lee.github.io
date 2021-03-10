@@ -64,9 +64,9 @@ for i, img_path in enumerate(next_1_pix+next_2_pix):
 plt.show()
 ```
 
-![programming-language-names](/images/2020-01-05-how-programming-laguages-got-their-names/2020-01-05-how-programming-laguages-got-their-names.jpg)
 
-![png](../assets/images/coal_classification_1_files/coal_classification_1_3_0.png)
+
+![coal_classification_1_3_0](../assets/images/coal_classification_1_files/coal_classification_1_3_0.png)
     
 
 
