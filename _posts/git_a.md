@@ -1,5 +1,6 @@
 ```python
 import os, glob
+import datetime
 ```
 
 
@@ -8,6 +9,10 @@ GH_USER="junha_lee"
 PC_USER="junha"
 POST_PATH="/Users/"+ PC_USER+"/document/github/"+GH_USER+".github.io/_posts" # <username>.github.io repository 가 있는 주소로 변경
 IMG_PATH="/Users/"+ PC_USER+"/document/github/"+GH_USER+".github.io/images"  # <username>.github.io repository 가 있는 주소로 변경
+
+t = datetime.datetime.today()
+time = t.strftime('%Y-%m-%d-')
+
 ```
 
 
@@ -35,11 +40,12 @@ files = glob.glob(condition)
 for i in range(len(files)):
     os.system("move "+files[i]+r" C:\Users\junha\Documents\GitHub\junha-lee.github.io\assets\images")
     f = open(files[i][:-6]+'.md', 'r+', encoding='UTF8')
-    line = f.read().replace('![png](', '![png](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/')
+    line = f.read().replace('![png](', '!['+files[i][:-6]+'](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/')
     f.close()
     f2 = open(files[i][:-6]+'.md', 'w', encoding='UTF8')
     f2.write(line)
     f2.close()
+    os.rename(files[i][:-6]+'.md', time.+files[i][:-6]+'.md')
 ```
 
 
@@ -54,6 +60,23 @@ mdfiles = glob.glob(condition)
 for i in range(len(mdfiles)):
     os.system("move "+mdfiles[i]+r" C:\Users\junha\Documents\GitHub\junha-lee.github.io\_posts")
 ```
+
+
+```python
+t = datetime.datetime.today()
+```
+
+
+```python
+time
+```
+
+
+
+
+    '2021-03-11-'
+
+
 
 
 ```python
