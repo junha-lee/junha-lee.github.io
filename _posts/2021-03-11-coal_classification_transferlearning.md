@@ -1220,7 +1220,7 @@ additional_model.summary()
 additional_model.compile(loss="binary_crossentropy", optimizer="nadam",metrics=['acc'])
 ```
 
-<h1>데이터 부풀리기
+<h1>데이터 부풀리기<h1>
 
 
 ```python
