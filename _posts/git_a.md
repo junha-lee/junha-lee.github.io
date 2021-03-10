@@ -45,7 +45,7 @@ for i in range(len(files)):
     f2 = open(files[i][:-6]+'.md', 'w', encoding='UTF8')
     f2.write(line)
     f2.close()
-    os.rename(files[i][:-6]+'.md', time.+files[i][:-6]+'.md')
+    os.rename(files[i][:-6]+'.md', time+files[i][:-6]+'.md')
 ```
 
 
@@ -60,23 +60,6 @@ mdfiles = glob.glob(condition)
 for i in range(len(mdfiles)):
     os.system("move "+mdfiles[i]+r" C:\Users\junha\Documents\GitHub\junha-lee.github.io\_posts")
 ```
-
-
-```python
-t = datetime.datetime.today()
-```
-
-
-```python
-time
-```
-
-
-
-
-    '2021-03-11-'
-
-
 
 
 ```python
