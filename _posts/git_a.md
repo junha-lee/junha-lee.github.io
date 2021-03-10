@@ -33,11 +33,11 @@ files = glob.glob(condition)
 
 ```python
 for i in range(len(files)):
-    os.system("move "+csvfiles[i]+r" C:\Users\junha\Documents\GitHub\junha-lee.github.io\assets\images")
-    f = open(csvfiles[i][:-6]+'.md', 'r+', encoding='UTF8')
-    line = f.read().replace('![png](', '![png](../assets/images/')
+    os.system("move "+files[i]+r" C:\Users\junha\Documents\GitHub\junha-lee.github.io\assets\images")
+    f = open(files[i][:-6]+'.md', 'r+', encoding='UTF8')
+    line = f.read().replace('![png](', '![png](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/')
     f.close()
-    f2 = open(csvfiles[i][:-6]+'.md', 'w', encoding='UTF8')
+    f2 = open(files[i][:-6]+'.md', 'w', encoding='UTF8')
     f2.write(line)
     f2.close()
 ```

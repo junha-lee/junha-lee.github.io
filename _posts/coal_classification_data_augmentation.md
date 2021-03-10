@@ -58,7 +58,7 @@ plt.show()
 
 
     
-![png](../assets/images/coal_classification_data_augmentation_files/coal_classification_data_augmentation_3_0.png)
+![png](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_data_augmentation_files/coal_classification_data_augmentation_3_0.png)
     
 
 
@@ -327,13 +327,13 @@ plt.figure()
 
 
     
-![png](../assets/images/coal_classification_data_augmentation_files/coal_classification_data_augmentation_13_1.png)
+![png](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_data_augmentation_files/coal_classification_data_augmentation_13_1.png)
     
 
 
 
     
-![png](../assets/images/coal_classification_data_augmentation_files/coal_classification_data_augmentation_13_2.png)
+![png](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_data_augmentation_files/coal_classification_data_augmentation_13_2.png)
     
 
 
