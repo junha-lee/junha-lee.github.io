@@ -1,12 +1,17 @@
 ---
-title: "논문 번역-ImageNet Classification with Deep Convolutional Neural Networks"
-categories: 
-  - MachineLearning
-last_modified_at: 2020-09-24T16:02:00+09:00
+title: capture & predict (raspberrypi)
+date: 2020-08-12
+category: coal
+tags:
+    - deep learning
+    - image detection
+    - coal
+    - IoT
 toc: true
 ---
 
-# Raspberry pi를 이용한 석탄 분류 장치 만들기
+### Raspberry pi를 이용한 석탄 분류 장치 만들기
+---
 
 
 ```python
@@ -40,7 +45,7 @@ if __name__ == '__main__':
     print(predict())
 ```
 
-### 가장 성능이 좋았던 "coal_classification_data_augmentation-epoch17" 모델을 사용했습니다.
+ 가장 성능이 좋았던 "coal_classification_data_augmentation-epoch17" 모델을 사용했습니다.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ogs_l6xo1nE" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
@@ -51,8 +56,3 @@ raspberry pi 석탄 분류기를 만들어봤습니다.
 이제 여러 종류의 석탄을 탐지하여 실제 컨테이너 밸트에서 분류하는 장치를 만들어 볼 생각입니다.
 
 읽어주셔서 감사합니다.
-
-
-```python
-
-```

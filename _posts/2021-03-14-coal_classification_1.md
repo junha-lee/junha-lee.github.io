@@ -1,18 +1,17 @@
 ---
-layout: post
 title: coal_classification
-date: 2020-07-28
+last_modified_at: 2020-07-28
 category: coal
 tags:
     - deep learning
     - image detection
     - coal
     - IoT
-mathjax: true
-comment: true
+toc: true
 ---
 
-## STEP 1. Load Dataset
+### STEP 1. Load Dataset
+---
 
 
 ```python
@@ -80,7 +79,8 @@ plt.show()
     
 
 
-## STEP 2. 전처리 (ImageDataGenerator)
+### STEP 2. 전처리 (ImageDataGenerator)
+---
 
 
 ```python
@@ -110,7 +110,8 @@ validation_generator = val_datagen.flow_from_directory(
         class_mode='binary')
 ```
 
-## STEP 3. 모델 정의 (Sequential)
+### STEP 3. 모델 정의 (Sequential)
+---
 
 
 ```python
@@ -195,7 +196,8 @@ model.summary()
     _________________________________________________________________
     
 
-## STEP 4. 컴파일 (compile)
+### STEP 4. 컴파일 (compile)
+---
 
 
 ```python
@@ -207,7 +209,8 @@ model.compile(loss="binary_crossentropy", optimizer="nadam",metrics=['acc'])
     Use tf.where in 2.0, which has the same broadcast rule as np.where
     
 
-## STEP 5. 학습 (fit)
+### STEP 5. 학습 (fit)
+---
 
 
 ```python
@@ -386,7 +389,8 @@ print(p2)
     7
     
 
-## Data augmentation 
+### Data augmentation 
+---
 
 
 ```python
@@ -665,7 +669,8 @@ print(p2)
     7
     
 
-# 추가 사용 모델
+### 모델 변경
+---
 
 
 ```python
@@ -733,7 +738,8 @@ additional_model.summary()
     _________________________________________________________________
     
 
-# 최종 결과
+### 최종 결과
+---
 
 ![coal_classificatio](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification.png)
 
