@@ -1,15 +1,9 @@
 ---
-layout: post
-title: capture & predict (raspberrypi)
-date: 2020-08-12
-category: coal
-tags:
-    - deep learning
-    - image detection
-    - coal
-    - IoT
-mathjax: true
-comment: true
+title: "논문 번역-ImageNet Classification with Deep Convolutional Neural Networks"
+categories: 
+  - MachineLearning
+last_modified_at: 2020-09-24T16:02:00+09:00
+toc: true
 ---
 
 # Raspberry pi를 이용한 석탄 분류 장치 만들기
