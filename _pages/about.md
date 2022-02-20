@@ -4,13 +4,14 @@ title: "About"
 excerpt: "Minimal Mistakes is a flexible two-column Jekyll theme."
 last_modified_at: 2021-01-25T13:58:25-04:00
 toc: true
+typora-copy-image-to: ..\assets\images\Travel
 ---
 <span style="color:lightslategray"> Welcome to **Junha's Development Log** </span>
 <br/><br/>
 
 ## Profile
 ---
-{% raw %} <img src="https://junha-lee.github.io/assets/images/junha.jpg" alt=""> {% endraw %}
+{% raw %} <img src="C:\Users\junha\Desktop\편집 사진\P1010037.PNG" alt="P1010037" style="zoom:24%;" />
 
 * Name : JUNHA, LEE<br/>
 * Incharge : IoT network LAB, Bachelor of dept.Internet of Things @ Univ.SoonCheonHyang<br/>

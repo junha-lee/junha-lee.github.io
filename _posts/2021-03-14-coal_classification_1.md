@@ -10,7 +10,10 @@ tags:
 toc: true
 ---
 
+[TOC]
+
 ### STEP 1. Load Dataset
+
 ---
 
 
@@ -40,7 +43,7 @@ print(train_2_fnames[:10])
 
     ['0.jpg', '1.jpg', '11.jpg', '12.jpg', '14.jpg', '15.jpg', '17.jpg', '18.jpg', '20.jpg', '21.jpg']
     ['10.png', '100.png', '101.png', '102.png', '104.png', '105.png', '107.png', '108.png', '109.png', '110.png']
-    
+
 
 
 ```python
@@ -74,9 +77,9 @@ plt.show()
 ```
 
 
-    
+​    
 ![coal_classificatio](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_1_files/coal_classification_1_5_0.png)
-    
+​    
 
 
 ### STEP 2. 전처리 (ImageDataGenerator)
@@ -159,7 +162,7 @@ model = Model(img_input, output)
     WARNING:tensorflow:From C:\Users\proto\anaconda3\envs\test\lib\site-packages\tensorflow\python\ops\init_ops.py:1251: calling VarianceScaling.__init__ (from tensorflow.python.ops.init_ops) with dtype is deprecated and will be removed in a future version.
     Instructions for updating:
     Call initializer instance with the dtype argument instead of passing it to the constructor
-    
+
 
 
 ```python
@@ -194,7 +197,7 @@ model.summary()
     Trainable params: 9,494,561
     Non-trainable params: 0
     _________________________________________________________________
-    
+
 
 ### STEP 4. 컴파일 (compile)
 ---
@@ -207,7 +210,7 @@ model.compile(loss="binary_crossentropy", optimizer="nadam",metrics=['acc'])
     WARNING:tensorflow:From C:\Users\proto\anaconda3\envs\test\lib\site-packages\tensorflow\python\ops\nn_impl.py:180: add_dispatch_support.<locals>.wrapper (from tensorflow.python.ops.array_ops) is deprecated and will be removed in a future version.
     Instructions for updating:
     Use tf.where in 2.0, which has the same broadcast rule as np.where
-    
+
 
 ### STEP 5. 학습 (fit)
 ---
@@ -280,7 +283,7 @@ validation_data = validation_generator
     80/80 [==============================] - 21s 258ms/step - loss: -596367016178.4758 - acc: 0.8578 - val_loss: 276827668480.0000 - val_acc: 0.8000
     Epoch 30/30
     80/80 [==============================] - 20s 255ms/step - loss: -690757124821.0276 - acc: 0.8527 - val_loss: 315089649664.0000 - val_acc: 0.8000
-    
+
 
 
 ```python
@@ -317,13 +320,13 @@ plt.figure()
 
 
 
-    
+​    
 ![coal_classificatio](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_1_files/coal_classification_1_16_1.png)
-    
+​    
 
 
 
-    
+
 ![coal_classificatio](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_1_files/coal_classification_1_16_2.png)
     
 
@@ -379,7 +382,7 @@ print(p1)
 ```
 
     3
-    
+
 
 
 ```python
@@ -387,7 +390,7 @@ print(p2)
 ```
 
     7
-    
+
 
 ### Data augmentation 
 ---
@@ -484,9 +487,9 @@ plt.show()
 ```
 
 
-    
+​    
 ![coal_classificatio](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_1_files/coal_classification_1_24_0.png)
-    
+​    
 
 
 
@@ -517,7 +520,7 @@ validation_generator = val_datagen.flow_from_directory(
 
     Found 4904 images belonging to 2 classes.
     Found 20 images belonging to 2 classes.
-    
+
 
 
 ```python
@@ -561,7 +564,7 @@ validation_data = validation_generator
     154/154 [==============================] - 66s 428ms/step - loss: 0.0072 - acc: 0.9978 - val_loss: 0.0024 - val_acc: 1.0000
     Epoch 17/17
     154/154 [==============================] - 66s 431ms/step - loss: 0.0026 - acc: 0.9996 - val_loss: 0.0046 - val_acc: 1.0000
-    
+
 
 
 ```python
@@ -597,13 +600,13 @@ plt.figure()
 
 
 
-    
+​    
 ![coal_classificatio](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_1_files/coal_classification_1_27_1.png)
-    
+​    
 
 
 
-    
+
 ![coal_classificatio](https://raw.githubusercontent.com/junha-lee/junha-lee.github.io/main/assets/images/coal_classification_1_files/coal_classification_1_27_2.png)
     
 
@@ -659,7 +662,7 @@ print(p1)
 ```
 
     3
-    
+
 
 
 ```python
@@ -667,7 +670,7 @@ print(p2)
 ```
 
     7
-    
+
 
 ### 모델 변경
 ---
@@ -700,7 +703,7 @@ additional_model.summary()
     Trainable params: 16,781,313
     Non-trainable params: 14,714,688
     _________________________________________________________________
-    
+
 
 
 ```python
@@ -736,7 +739,7 @@ additional_model.summary()
     Trainable params: 19,140,097
     Non-trainable params: 20,024,384
     _________________________________________________________________
-    
+
 
 ### 최종 결과
 ---

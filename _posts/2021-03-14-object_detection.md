@@ -5,6 +5,8 @@ category: coal
 toc: true
 ---
 
+[TOC]
+
 이번 포스트에서는 라즈베리파이를 이용해 석탄을 탐지하기 위해 object Detection 논문들을 리뷰합니다.
 
 ### Object Detection
