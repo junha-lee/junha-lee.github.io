@@ -7,7 +7,7 @@ toc: true
 typora-copy-image-to: ..\assets\images\coal_classification_1_files
 ---
 
-[TOC]
+
 
 
 
@@ -104,16 +104,16 @@ mAP: 모든 클래스 별로 AP를 구하고 평균낸 값을 뜻한다.
 
 1. Darknet : YOLO 개발자가 만든 프레임워크. 
   장점 : 빠르다. GPU또는 CPU와 함께 사용가능
-      단점 : 리눅스에서만 호환
+        단점 : 리눅스에서만 호환
 
 2. Darkflow : Darknet을 텐서플로우에 적용한것
   장점 : 빠르고 GPU 또는 CPU와 함께 사용 가능
           리눅스, 윈도우, 맥에서 호환
-      단점 : 설치 복잡
+        단점 : 설치 복잡
 
 3. OpenCV : 최소 3.4.2버전 필요
   장점 : openCV외에 설치할 것이 없다
-      단점 : CPU에서만 작동(느림)
+        단점 : CPU에서만 작동(느림)
 
 Tensorflow가 설치된 윈도우 환경에서 구동하기 위해 Darkflow를 사용 
 

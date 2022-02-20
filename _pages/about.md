@@ -6,17 +6,16 @@ last_modified_at: 2021-01-25T13:58:25-04:00
 toc: true
 ---
 <span style="color:lightslategray"> Welcome to **Junha's Development Log** </span>
-<br/><br/>
+
+
 
 ## Profile
----
 {% raw %} ![P1010037](../assets/images/about/P1010037.PNG) {% endraw %}
 
 * Name : JUNHA, LEE<br/>
 * Incharge : IoT network LAB, Bachelor of dept.Internet of Things @ Univ.SoonCheonHyang<br/>
 
 ## Current Interest
----
 * Artifitial Intelligence<br/>
 * Machine Learning<br/>
 * Deep Learning<br/>
@@ -24,7 +23,6 @@ toc: true
 * Data Analysis<br/>
 
 ## Career & Activities
----
 * <pre>2020 - Present</pre> IoI (AI Club) student<br/>
 > translate ‘Hands on machine learning<br/>
 > data analysis in ‘Kaggle’<br/>
@@ -36,7 +34,6 @@ toc: true
 
 
 ## Contact
----
 * Email : junha4304@gmail.com<br/>
 * Git : [github.com/junha-lee](github.com/junha-lee)<br/>
 * Blog : [junha-lee.github.io](junha-lee.github.io)<br/>
