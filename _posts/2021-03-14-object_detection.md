@@ -3,6 +3,9 @@ title: Object Detection
 date: 2020-09-01
 category: coal
 toc: true
+author_profile: false
+sidebar:
+  nav: "docs"
 ---
 
 
