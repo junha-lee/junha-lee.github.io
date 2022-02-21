@@ -1,6 +1,6 @@
 ---
 title: coal_classification
-last_modified_at: 2020-07-28
+date: 2020-07-28
 category: coal
 tags:
     - deep learning
