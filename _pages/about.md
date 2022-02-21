@@ -41,16 +41,16 @@ sharing economy through the connection of idle resources.
 ## Research experience
 
 1. **'Development and Verification of Manufacturing System for anthracite**
-  **Screening and Corrosive Paste'**<br/>
-  J U LY 2 0 2 0 — F E B R U A R Y 2 0 2 1<br/>
-  organization: Ministry of SMEs and Startups<br/>
-  Role: research assistant<br/>
+    **Screening and Corrosive Paste'**<br/>
+    J U LY 2 0 2 0 — F E B R U A R Y 2 0 2 1<br/>
+    organization: Ministry of SMEs and Startups<br/>
+    Role: research assistant<br/>
   - Darkflow with raspberry pi to develop anthracite detection system
   - CRNN to high accuracy object detection
 2. **'ESS-IoT Smart Convergence Technology Advanced Track'**<br/>
-  M A R C H 2 0 2 0 — M A R C H 2 0 2 1<br/>
-  organization: Korea Energy Technology Evaluation and Planning<br/>
-  Role: research assistant<br/>
+    M A R C H 2 0 2 0 — M A R C H 2 0 2 1<br/>
+    organization: Korea Energy Technology Evaluation and Planning<br/>
+    Role: research assistant<br/>
   - Imitation learning by HVAC to develop ESS-IoT system
   - RNN to forecast optimal Energy Consumption
   - DDPG to effective ESS-IoT system
@@ -129,7 +129,7 @@ M A R C H 2 0 1 9 — M AY 2 0 1 9<br/>
 ## Contact
 
 * Email : junha4304@gmail.com<br/>
-* Git : [github.com/junha-lee](github.com/junha-lee)<br/>
-* Blog : [junha-lee.github.io](junha-lee.github.io)<br/>
+* Git :[https://github.com/junha-lee](https://github.com/junha-lee)<br/>
+* Blog :[https://junsoultour.blogspot.com](https://junsoultour.blogspot.com)<br/>
 * Address : 73, Siheung-daero, Geumcheon-gu, Seoul, Republic of Korea<br/>
 
