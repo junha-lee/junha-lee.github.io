@@ -112,10 +112,12 @@ author:
   bio              : "welcome to Jun's_pace"
   location         : "Republic of Korea"
   email            : "junha4304@gmail.com"
-  links:
-
+  links: 
+    - label: "about"
+      icon: "fas fa-fw fa-address-card"
+      url: "https://junha-lee.github.io/about/"
     - label: "여행 사진들"
-      icon: "fas fa-fw fa-link"
+      icon: "fas fa-fw fa-camera"
       url: "https://junsoultour.blogspot.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"

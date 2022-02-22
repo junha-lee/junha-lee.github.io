@@ -1,7 +1,11 @@
 ---
 title: Object Detection
 date: 2020-09-01
-category: coal
+category: project
+tags:
+    - image detection
+    - coal
+    - IoT
 toc: true
 author_profile: false
 sidebar:

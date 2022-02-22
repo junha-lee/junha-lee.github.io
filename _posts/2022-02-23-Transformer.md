@@ -1,0 +1,15 @@
+---
+title: DB(1)
+date: 2020-10-27
+category: lecture-review
+tags:
+    - DB
+toc: true
+author_profile: false
+sidebar:
+  nav: "docs"
+---
+
+## 연구 목표
+
+내일 포스팅 시작

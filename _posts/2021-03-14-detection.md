@@ -1,9 +1,8 @@
 ---
 title: capture & predict (raspberrypi)
 date: 2020-08-12
-category: coal
+category: project
 tags:
-    - deep learning
     - image detection
     - coal
     - IoT

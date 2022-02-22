@@ -1,7 +1,7 @@
 ---
 title: coal_classification
 date: 2020-07-28
-category: coal
+category: project
 tags:
     - deep learning
     - image detection

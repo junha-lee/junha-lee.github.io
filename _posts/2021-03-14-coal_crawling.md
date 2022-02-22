@@ -1,7 +1,7 @@
 ---
 title: coal crawling
 date: 2020-07-18
-category: coal
+category: project
 tags:
     - web crawling
     - Selenium

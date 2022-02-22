@@ -1,10 +1,8 @@
 ---
 title: 통계 스터디 시작
 date: 2022-02-22
-category: Statistics
+category: study
 tags:
-    - study
-    - DA
     - Linear Algebra
 toc: true
 author_profile: false

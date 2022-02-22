@@ -1,10 +1,9 @@
 ---
 title: Deep Reinforcement learning
 date: 2020-12-23
-category: RL
+category: project
 tags:
     - RL
-    - Project
 toc: true
 author_profile: false
 sidebar:
