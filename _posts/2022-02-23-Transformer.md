@@ -1,9 +1,9 @@
 ---
-title: DB(1)
-date: 2020-10-27
-category: lecture-review
+title: Transformer 
+date: 2018-10-27
+category: Paper-Review
 tags:
-    - DB
+    - Transformer
 toc: true
 author_profile: false
 sidebar:
@@ -13,3 +13,4 @@ sidebar:
 ## 연구 목표
 
 내일 포스팅 시작
+
