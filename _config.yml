@@ -262,7 +262,7 @@ defaults:
       layout: single
       author_profile: true
       read_time: false # 읽는 시간 대신 날짜
-      show_date : true
+      show_date: true
       comments:  true
       share: true
       related: true
