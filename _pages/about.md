@@ -31,8 +31,12 @@ sharing economy through the connection of idle resources.
 <details markdown="1"> <summary>Implementation of the IoT Resources Remote Sharing System based on Web</summary>  KICS Summer General Academic Conference. p1262-p1263<br/>
 A U G U S T 2 0 2 0  </details>
 
+
+
 <details markdown="1"> <summary>A Study on the Forecasting System for Sales Growth and Reduction Rate in E-Commerce using Machine Learning</summary>  KICS Summer General Academic Conference. P1264-p1265<br/>
 A U G U S T 2 0 2 0
+
+
 
 ## Research experience
 
@@ -62,20 +66,32 @@ A U G U S T 2 0 2 0
 
 <details markdown="1"> <summary>Gaussian Random Paths for Real-Time Motion Planning</summary>   N O V E M B E R 2 0 2 1 —  J A N U A R Y 2 0 2 2<br/> Gousian process, Pykin
 
+
+
 <details markdown="1"> <summary>Lecture about Tensorflow developer certificate</summary>   M A R C H 2 0 2 1 —  N O V E M B E R 2 0 2 1<br/>
 Tensorflow, keras
+
+
 
 <details markdown="1"> <summary>Stress management by interlocking wearable watch with smart phone</summary>   M A R C H 2 0 1 9 — M A R C H 2 0 2 1<br/>
 Design Thinking , Business Modeling, Adobe XD, Android application developing, Tizen application developing
 
+
+
 <details markdown="1"> <summary>Blood donation platform using Ethereum smart contract</summary>   J U LY 2 0 2 0 — A U G U S T 2 0 2 0<br/>
 Node.js, flask
+
+
 
 <details markdown="1"> 
 <summary>Voting system using Ethereum smart contract</summary>   J U LY 2 0 1 9 — A U G U S T 2 0 1 9<br/> Block chain, Solidity
 
+
+
 <details markdown="1"> 
 <summary>Improvement of sitting disease using mobius</summary>   M A R C H 2 0 1 9 — M AY 2 0 1 9<br/> oneM2M IoT Server Platform
+
+
 
 ## Awards and Honors
 
@@ -98,8 +114,6 @@ Node.js, flask
 ## Additional Information
 
 **IoT Network Laboratory Researcher**<br/>
-
-2 0 1 7 — J U N E 2 0 2 1
 
 ## Contact
 
