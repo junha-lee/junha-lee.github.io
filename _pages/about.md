@@ -31,7 +31,7 @@ sharing economy through the connection of idle resources.
 <details> 
 <summary>Implementation of the IoT Resources Remote Sharing System based on Web</summary>
 <div markdown="1">
-KICS Summer General Academic Conference. p1262-p1263<br/>
+<br/>KICS Summer General Academic Conference. p1262-p1263<br/>
 A U G U S T 2 0 2 0
     
 </div>
@@ -39,24 +39,38 @@ A U G U S T 2 0 2 0
 
 
 
-
-<details markdown="1"> <summary>A Study on the Forecasting System for Sales Growth and Reduction Rate in E-Commerce using Machine Learning</summary>  KICS Summer General Academic Conference. P1264-p1265<br/>
+<details> <summary>A Study on the Forecasting System for Sales Growth and Reduction Rate in E-Commerce using Machine Learning</summary>
+<div markdown="1">
+<br/>KICS Summer General Academic Conference. P1264-p1265<br/>
 A U G U S T 2 0 2 0
-* 
+    
+</div>
+</details>
 
 
 ## Research experience
 
-1. <details markdown="1"> <summary>Development and Verification of Manufacturing System for anthracite Screening and Corrosive Paste</summary>  J U LY 2 0 2 0 — F E B R U A R Y 2 0 2 1<br/>
+1. <details> <summary>Development and Verification of Manufacturing System for anthracite Screening and Corrosive Paste</summary>
+    <div markdown="1">
+    <br/>J U LY 2 0 2 0 — F E B R U A R Y 2 0 2 1<br/>
     organization: Ministry of SMEs and Startups<br/>
     Role: research assistant<br/>
+        
+    </div>
+    </details>
 
 - Darkflow with raspberry pi to develop anthracite detection system
 - CRNN to high accuracy object detection
 
-2. <details markdown="1"> <summary>ESS-IoT Smart Convergence Technology Advanced Track</summary>  M A R C H 2 0 2 0 — M A R C H 2 0 2 1<br/>
+2. <details> <summary>ESS-IoT Smart Convergence Technology Advanced Track</summary>
+    <div markdown="1">
+    
+    <br/>M A R C H 2 0 2 0 — M A R C H 2 0 2 1<br/>
     organization: Korea Energy Technology Evaluation and Planning<br/>
     Role: research assistant<br/>
+    
+    </div>
+    </details>    
   - Imitation learning by HVAC to develop ESS-IoT system
   - RNN to forecast optimal Energy Consumption
   - DDPG to effective ESS-IoT system
@@ -71,32 +85,75 @@ A U G U S T 2 0 2 0
 
 ## Other Projects
 
-<details markdown="1"> <summary>Gaussian Random Paths for Real-Time Motion Planning</summary>   N O V E M B E R 2 0 2 1 —  J A N U A R Y 2 0 2 2<br/> Gousian process, Pykin
+<details> <summary>Gaussian Random Paths for Real-Time Motion Planning</summary>
+<div markdown="1">
 
+<br/>N O V E M B E R 2 0 2 1 —  J A N U A R Y 2 0 2 2<br/>
+Gousian process, Pykin
 
+</div>
+</details>    
 
-<details markdown="1"> <summary>Lecture about Tensorflow developer certificate</summary>   M A R C H 2 0 2 1 —  N O V E M B E R 2 0 2 1<br/>
+## 
+
+<details> 
+<summary>Lecture about Tensorflow developer certificate</summary>
+<div markdown="1">
+
+<br/> M A R C H 2 0 2 1 —  N O V E M B E R 2 0 2 1<br/>
 Tensorflow, keras
 
+</div>
+</details>    
 
+<details> 
+<summary>Stress management by interlocking wearable watch with smart phone</summary>
+<div markdown="1">
 
-<details markdown="1"> <summary>Stress management by interlocking wearable watch with smart phone</summary>   M A R C H 2 0 1 9 — M A R C H 2 0 2 1<br/>
+<br/>M A R C H 2 0 1 9 — M A R C H 2 0 2 1<br/>
 Design Thinking , Business Modeling, Adobe XD, Android application developing, Tizen application developing
 
+</div>
+</details>    
 
 
-<details markdown="1"> <summary>Blood donation platform using Ethereum smart contract</summary>   J U LY 2 0 2 0 — A U G U S T 2 0 2 0<br/>
+
+<details> 
+<summary>Blood donation platform using Ethereum smart contract</summary>
+<div markdown="1">
+
+<br/>J U LY 2 0 2 0 — A U G U S T 2 0 2 0<br/>
 Node.js, flask
 
+</div>
+</details>    
 
 
-<details markdown="1"> 
-<summary>Voting system using Ethereum smart contract</summary>   J U LY 2 0 1 9 — A U G U S T 2 0 1 9<br/> Block chain, Solidity
 
 
 
-<details markdown="1"> 
-<summary>Improvement of sitting disease using mobius</summary>   M A R C H 2 0 1 9 — M AY 2 0 1 9<br/> oneM2M IoT Server Platform
+<details> 
+<summary>Voting system using Ethereum smart contract</summary>
+<div markdown="1">
+
+<br/> J U LY 2 0 1 9 — A U G U S T 2 0 1 9<br/> Block chain, Solidity
+
+</div>
+</details>    
+
+
+
+
+
+<details> 
+<summary>Improvement of sitting disease using mobius</summary>
+<div markdown="1">
+
+<br/> M A R C H 2 0 1 9 — MAY 2 0 1 9<br/> oneM2M IoT Server Platform
+
+</div>
+</details>    
+
 
 
 
