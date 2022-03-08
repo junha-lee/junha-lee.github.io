@@ -37,12 +37,6 @@ A U G U S T 2 0 2 0
 </div>
 </details>
 
-KICS Summer General Academic Conference. p1262-p1263<br/>
-A U G U S T 2 0 2 0
-    
-</div>
-</details>
-
 
 
 
