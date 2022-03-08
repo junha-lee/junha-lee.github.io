@@ -47,20 +47,23 @@ A U G U S T 2 0 2 0
 </div>
 </details>
 
-
 ## Research experience
+
+
 
 1. <details> <summary>Development and Verification of Manufacturing System for anthracite Screening and Corrosive Paste</summary>
     <div markdown="1">
     <br/>J U LY 2 0 2 0 — F E B R U A R Y 2 0 2 1<br/>
     organization: Ministry of SMEs and Startups<br/>
     Role: research assistant<br/>
-        
+    
+    - Darkflow with raspberry pi to develop anthracite detection system
+    - CRNN to high accuracy object detection
+    
+    
+    ​    
     </div>
     </details>
-
-- Darkflow with raspberry pi to develop anthracite detection system
-- CRNN to high accuracy object detection
 
 2. <details> <summary>ESS-IoT Smart Convergence Technology Advanced Track</summary>
     <div markdown="1">
@@ -69,11 +72,12 @@ A U G U S T 2 0 2 0
     organization: Korea Energy Technology Evaluation and Planning<br/>
     Role: research assistant<br/>
     
+      - Imitation learning by HVAC to develop ESS-IoT system
+      - RNN to forecast optimal Energy Consumption
+      - DDPG to effective ESS-IoT system
+    
     </div>
-    </details>    
-  - Imitation learning by HVAC to develop ESS-IoT system
-  - RNN to forecast optimal Energy Consumption
-  - DDPG to effective ESS-IoT system
+    </details>   
 
 ## Patent
 
@@ -89,12 +93,10 @@ A U G U S T 2 0 2 0
 <div markdown="1">
 
 <br/>N O V E M B E R 2 0 2 1 —  J A N U A R Y 2 0 2 2<br/>
-Gousian process, Pykin
+Gausian process, Pykin
 
 </div>
 </details>    
-
-## 
 
 <details> 
 <summary>Lecture about Tensorflow developer certificate</summary>
