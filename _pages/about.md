@@ -28,14 +28,27 @@ sharing economy through the connection of idle resources.
 
 ## Publications
 
-<details markdown="1"> <summary>Implementation of the IoT Resources Remote Sharing System based on Web</summary>  KICS Summer General Academic Conference. p1262-p1263<br/>
-A U G U S T 2 0 2 0  </details>
+<details> 
+<summary>Implementation of the IoT Resources Remote Sharing System based on Web</summary>
+<div markdown="1">
+KICS Summer General Academic Conference. p1262-p1263<br/>
+A U G U S T 2 0 2 0
+    
+</div>
+</details>
+
+KICS Summer General Academic Conference. p1262-p1263<br/>
+A U G U S T 2 0 2 0
+    
+</div>
+</details>
+
 
 
 
 <details markdown="1"> <summary>A Study on the Forecasting System for Sales Growth and Reduction Rate in E-Commerce using Machine Learning</summary>  KICS Summer General Academic Conference. P1264-p1265<br/>
 A U G U S T 2 0 2 0
-
+* 
 
 
 ## Research experience
