@@ -18,13 +18,6 @@
             </ul>
             <ul>
                 {% for category in site.categories %}
-                    {% if category[0] == "NLP" %}
-                        <li><a href="/categories/NLP" class="">NLP ({{category[1].size}})</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-            <ul>
-                {% for category in site.categories %}
                     {% if category[0] == "IoT" %}
                         <li><a href="/categories/IoT" class="">IoT  ({{category[1].size}})</a></li>
                     {% endif %}
@@ -69,7 +62,7 @@
                 {% endfor %}
             </ul>
 
-        <span class="nav__sub-title">Review</span>
+        <span class="nav__sub-title">Study</span>
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "paper" %}
@@ -84,7 +77,13 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "NLP" %}
+                        <li><a href="/categories/NLP" class="">NLP ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
         <span class="nav__sub-title">etc</span>
             <ul>
                 {% for category in site.categories %}
