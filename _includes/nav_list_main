@@ -26,7 +26,7 @@
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "rl" %}
-                        <li><a href="/categories/RL" class="">Reinforcement Learning ({{category[1].size}})</a></li>
+                        <li><a href="/categories/rl" class="">Reinforcement Learning ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
