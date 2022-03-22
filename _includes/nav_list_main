@@ -26,14 +26,14 @@
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "rl" %}
-                        <li><a href="/categories/rl" class="">Reinforcement Learning ({{category[1].size}})</a></li>
+                    <li><a href="/categories/rl" class="">Reinforcement Learning ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "hvac" %}
-                        <li><a href="/categories/HVAC" class="">HAVC ({{category[1].size}})</a></li>
+                        <li><a href="/categories/hvac" class="">HVAC ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -79,8 +79,8 @@
             </ul>
             <ul>
                 {% for category in site.categories %}
-                    {% if category[0] == "NLP" %}
-                        <li><a href="/categories/NLP" class="">NLP ({{category[1].size}})</a></li>
+                    {% if category[0] == "nlp" %}
+                        <li><a href="/categories/nlp" class="">NLP ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
