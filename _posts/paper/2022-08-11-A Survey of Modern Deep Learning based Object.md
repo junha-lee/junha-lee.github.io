@@ -1,11 +1,9 @@
-
-
     title: Object Detection
     date: 2022.08.11
     category: paper
     tags:
-    - Object Detection
-    - paper
+    	- Object Detection
+    	- paper
     toc: true
     author_profile: false
     sidebar:
@@ -145,7 +143,6 @@ B.VGG
 - 1개의 5 x 5 filter는 총  1*5*5*채널 개의 parameter를 사용
 - 2개의 3 x 3 filter는 총 2*3*3*채널 개의 parameter를 사용
 
-    
 
 C.GoogLeNet
 
