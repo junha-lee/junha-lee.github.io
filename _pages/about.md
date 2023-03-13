@@ -20,12 +20,6 @@ embedded systems, (b) IoT Platform with Artificial Intelligence, and (c) Busines
 modeling with enhanced IoT platform. I would like to study the vitalization of the
 sharing economy through the connection of idle resources.
 
-## Education
-* **Bachelor of Engineering in Internet of Things**, Soonchunhyang University<br/>
-  M A R C H 2 0 1 7 — A U G U S T 2 0 2 1
-* **Bachelor of Engineering in Robot Convergence**, Soonchunhyang University<br/>
-  M A R C H 2 0 1 7 — A U G U S T 2 0 2 1
-
 ## Publications
 
 <details> 
